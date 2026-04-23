@@ -16,51 +16,67 @@ const toggleUserMenu = () => {
 </script>
 
 <template>
-  <header class="bg-white border-b px-6 py-4" style="border-color: rgba(243, 232, 226, 0.2); box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);">
-    <div class="flex items-center justify-between">
+  <header class="px-6 h-[70px] flex items-center sticky top-0 z-20 bg-white border-b border-border-light">
+    <div class="flex items-center justify-between w-full">
       <div class="flex items-center space-x-4">
         <button
           @click="emit('toggle-sidebar')"
-          class="p-2 rounded-xl transition-all duration-300"
-          style="color: #2D2D2D;"
-          @mouseover="event.target.style.backgroundColor = 'rgba(243, 232, 226, 0.3)'"
-          @mouseout="event.target.style.backgroundColor = 'transparent'"
+          class="p-2 transition-all duration-200 text-text-primary hover:bg-bg-secondary"
+          style="border-radius: 12px;"
         >
           <i :class="['pi', sidebarOpen ? 'pi-angle-left' : 'pi-angle-right', 'text-lg']"></i>
         </button>
-        <h2 class="text-lg font-semibold" style="color: #2D2D2D;">
+        <h2 class="text-lg font-semibold text-text-primary">
           Tender Management System
         </h2>
       </div>
 
       <div class="flex items-center space-x-4">
         <div class="relative">
+          <input
+            type="text"
+            placeholder="Search..."
+            class="h-10 px-4 w-64 text-sm focus:outline-none transition-all duration-200 text-text-primary"
+            style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 22px;"
+          />
+        </div>
+
+        <button
+          class="px-5 h-10 text-white font-medium transition-all duration-200 hover:opacity-90"
+          style="background: #3B82F6; border-radius: 12px;"
+        >
+          + New Tender
+        </button>
+
+        <button class="relative p-2 transition-all duration-200 text-text-primary hover:bg-bg-secondary" style="border-radius: 12px;">
+          <i class="pi pi-bell text-lg"></i>
+          <span class="absolute top-1 right-1 w-2 h-2 bg-status-red rounded-full"></span>
+        </button>
+
+        <div class="relative">
           <button
             @click="toggleUserMenu"
-            class="flex items-center space-x-3 p-2 rounded-xl transition-all duration-300"
-            @mouseover="event.target.style.backgroundColor = 'rgba(243, 232, 226, 0.3)'"
-            @mouseout="event.target.style.backgroundColor = 'transparent'"
+            class="flex items-center space-x-3 p-2 transition-all duration-200 hover:bg-bg-secondary"
+            style="border-radius: 12px;"
           >
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-semibold" style="background-color: #D97706; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+            <div class="w-10 h-10 flex items-center justify-center text-white font-semibold" style="background: #3B82F6; border-radius: 12px;">
               {{ user?.name?.charAt(0) || 'U' }}
             </div>
             <div v-if="user" class="text-left">
-              <p class="text-sm font-medium" style="color: #2D2D2D;">{{ user.name }}</p>
-              <p class="text-xs text-gray-500 capitalize">{{ user.role?.replace('_', ' ') }}</p>
+              <p class="text-sm font-medium text-text-primary">{{ user.name }}</p>
+              <p class="text-xs text-text-tertiary capitalize">{{ user.role?.replace('_', ' ') }}</p>
             </div>
-            <i class="pi pi-chevron-down text-gray-500"></i>
+            <i class="pi pi-chevron-down text-text-tertiary"></i>
           </button>
 
           <div
             v-if="showUserMenu"
-            class="absolute right-0 mt-2 w-48 bg-white rounded-xl py-2 z-50"
-            style="border-color: rgba(243, 232, 226, 0.2); box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);"
+            class="absolute right-0 mt-2 w-48 bg-white py-2 z-50 border border-border-light shadow-lg"
+            style="border-radius: 12px;"
           >
             <button
               @click="emit('logout')"
-              class="w-full px-4 py-2 text-left text-red-600 transition-colors flex items-center"
-              @mouseover="event.target.style.backgroundColor = 'rgba(243, 232, 226, 0.3)'"
-              @mouseout="event.target.style.backgroundColor = 'transparent'"
+              class="w-full px-4 py-2 text-left text-status-red hover:bg-bg-secondary transition-colors flex items-center"
             >
               <i class="pi pi-sign-out mr-2"></i>
               Logout

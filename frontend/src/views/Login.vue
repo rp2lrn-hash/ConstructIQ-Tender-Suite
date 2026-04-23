@@ -34,20 +34,20 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center px-4 animate-fade-in" style="background-color: #F9FAFB;">
+  <div class="min-h-screen flex items-center justify-center px-4 animate-fade-in" style="background: #F8FAFC;">
     <div class="max-w-md w-full">
-      <div class="bg-white rounded-2xl border p-8 animate-slide-up" style="border-color: rgba(243, 232, 226, 0.2); box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);">
+      <div class="bg-white border border-border-light p-8 animate-slide-up card-premium" style="border-radius: 16px;">
         <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style="background-color: #FEF3C7; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
-            <i class="pi pi-building text-4xl" style="color: #D97706;"></i>
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style="background: #3B82F6;">
+            <i class="pi pi-box text-4xl text-white"></i>
           </div>
-          <h1 class="text-3xl font-bold" style="color: #2D2D2D;">ConstructIQ</h1>
-          <p class="text-gray-600 mt-2">Tender Management System</p>
+          <h1 class="text-3xl font-bold text-text-primary">PROLOGISTIC</h1>
+          <p class="text-text-secondary mt-2">Tender Management System</p>
         </div>
 
         <form @submit.prevent="handleLogin" class="space-y-6">
           <div>
-            <label for="email" class="block text-sm font-medium mb-2" style="color: #2D2D2D;">
+            <label for="email" class="block text-sm font-medium mb-2 text-text-primary">
               Email
             </label>
             <InputText
@@ -58,12 +58,12 @@ const handleLogin = async () => {
               class="w-full"
               autocomplete="email"
               required
-              style="background: #F9FAFB; border: 1px solid #F3E8E2; border-radius: 12px; padding: 12px;"
+              style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 22px; padding: 12px;"
             />
           </div>
 
           <div>
-            <label for="password" class="block text-sm font-medium mb-2" style="color: #2D2D2D;">
+            <label for="password" class="block text-sm font-medium mb-2 text-text-primary">
               Password
             </label>
             <Password
@@ -75,28 +75,26 @@ const handleLogin = async () => {
               toggleMask
               autocomplete="current-password"
               required
-              input-style="background: #F9FAFB; border: 1px solid #F3E8E2; border-radius: 12px; padding: 12px;"
+              input-style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 22px; padding: 12px;"
             />
           </div>
 
-          <div v-if="error" class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">
+          <div v-if="error" class="p-4 bg-status-red-light text-status-red" style="border-radius: 12px;">
             {{ error }}
           </div>
 
           <button
             type="submit"
             :disabled="loading"
-            class="w-full px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 text-white font-semibold"
-            style="background-color: #D97706; box-shadow: 8px 8px 16px #F3E8E2, -8px -8px 16px #F9FAFB;"
-            @mouseover="event.target.style.boxShadow = '8px 8px 16px #d1d5db, -8px -8px 16px #ffffff'"
-            @mouseout="event.target.style.boxShadow = '8px 8px 16px #F3E8E2, -8px -8px 16px #F9FAFB'"
+            class="w-full text-white font-medium transition-all duration-200 hover:opacity-90"
+            style="background: #3B82F6; border-radius: 12px; padding: 0.75rem 1.5rem;"
           >
             {{ loading ? 'Signing in...' : 'Sign In' }}
           </button>
         </form>
 
         <div class="mt-6 text-center">
-          <p class="text-sm text-gray-500">
+          <p class="text-sm text-text-tertiary">
             Demo credentials: admin@acme.com / Admin@123
           </p>
         </div>

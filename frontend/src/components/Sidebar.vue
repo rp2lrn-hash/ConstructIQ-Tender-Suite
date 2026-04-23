@@ -50,62 +50,122 @@ const navigate = (path) => {
 <template>
   <aside 
     :class="[
-      'bg-white border-r transition-all duration-300',
-      open ? 'w-64' : 'w-20'
+      'text-text-primary transition-all duration-300 flex flex-col relative z-10 bg-white',
+      open ? 'w-[260px]' : 'w-20'
     ]"
-    style="border-color: rgba(243, 232, 226, 0.2); box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);"
+    style="height: 100vh; border-right: 1px solid #E2E8F0;"
   >
-    <div class="p-4 border-b" style="border-color: rgba(243, 232, 226, 0.2);">
-      <h1 v-if="open" class="text-xl font-bold flex items-center" style="color: #2D2D2D;">
-        <i class="pi pi-building mr-2" style="color: #D97706;"></i>
-        ConstructIQ
+    <div class="p-6 border-b border-border-light">
+      <h1 v-if="open" class="text-xl font-bold leading-tight text-text-primary">
+        PROLOGISTIC
+        <span class="block text-sm font-normal text-text-secondary">LOGISTICS</span>
       </h1>
       <div v-else class="text-center">
-        <i class="pi pi-building text-2xl" style="color: #D97706;"></i>
+        <i class="pi pi-box text-2xl text-text-primary"></i>
       </div>
     </div>
 
-    <nav class="p-4 space-y-2">
-      <button
-        v-for="item in menuItems"
-        :key="item.path"
-        @click="navigate(item.path)"
-        :class="[
-          'flex items-center w-full p-3 rounded-xl transition-all duration-300',
-          route.path === item.path
-            ? 'text-white'
-            : ''
-        ]"
-        :style="route.path === item.path 
-          ? 'background-color: #D97706; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);'
-          : 'color: #2D2D2D;'
-        "
-        @mouseover="route.path !== item.path && (event.target.style.backgroundColor = 'rgba(243, 232, 226, 0.3)')"
-        @mouseout="route.path !== item.path && (event.target.style.backgroundColor = 'transparent')"
-      >
-        <i :class="[item.icon, 'text-lg']"></i>
-        <span v-if="open" class="ml-3 font-medium">{{ item.label }}</span>
-      </button>
+    <nav class="flex-1 p-4 space-y-6 overflow-y-auto">
+      <div v-if="open">
+        <p class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">Main</p>
+        <div class="space-y-2">
+          <button
+            v-for="item in menuItems.filter(i => ['/', '/tenders'].includes(i.path))"
+            :key="item.path"
+            @click="navigate(item.path)"
+            :class="[
+              'flex items-center w-full p-3 transition-all duration-200',
+              route.path === item.path
+                ? 'bg-accent-blue-light text-accent-blue'
+                : 'hover:bg-bg-secondary text-text-secondary'
+            ]"
+            style="border-radius: 12px;"
+          >
+            <i :class="[item.icon, 'text-lg']"></i>
+            <span class="ml-3 font-medium">{{ item.label }}</span>
+            <span v-if="item.path === '/tenders'" class="ml-auto bg-status-red text-white text-xs px-2 py-0.5" style="border-radius: 999px;">32</span>
+          </button>
+        </div>
+      </div>
+
+      <div v-if="open && authStore.isEvaluator">
+        <p class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">Finance</p>
+        <div class="space-y-2">
+          <button
+            v-for="item in menuItems.filter(i => ['/evaluations', '/contracts'].includes(i.path))"
+            :key="item.path"
+            @click="navigate(item.path)"
+            :class="[
+              'flex items-center w-full p-3 transition-all duration-200',
+              route.path === item.path
+                ? 'bg-accent-blue-light text-accent-blue'
+                : 'hover:bg-bg-secondary text-text-secondary'
+            ]"
+            style="border-radius: 12px;"
+          >
+            <i :class="[item.icon, 'text-lg']"></i>
+            <span class="ml-3 font-medium">{{ item.label }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div v-if="open && authStore.isAdmin">
+        <p class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">Admin</p>
+        <div class="space-y-2">
+          <button
+            v-for="item in menuItems.filter(i => ['/admin/users', '/admin/customers', '/admin/audit-logs'].includes(i.path))"
+            :key="item.path"
+            @click="navigate(item.path)"
+            :class="[
+              'flex items-center w-full p-3 transition-all duration-200',
+              route.path === item.path
+                ? 'bg-accent-blue-light text-accent-blue'
+                : 'hover:bg-bg-secondary text-text-secondary'
+            ]"
+            style="border-radius: 12px;"
+          >
+            <i :class="[item.icon, 'text-lg']"></i>
+            <span class="ml-3 font-medium">{{ item.label }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div v-if="!open" class="space-y-2">
+        <button
+          v-for="item in menuItems"
+          :key="item.path"
+          @click="navigate(item.path)"
+            :class="[
+              'flex items-center justify-center w-full p-3 transition-all duration-200',
+              route.path === item.path
+                ? 'bg-accent-blue-light text-accent-blue'
+                : 'hover:bg-bg-secondary text-text-secondary'
+            ]"
+            style="border-radius: 12px;"
+        >
+          <i :class="[item.icon, 'text-lg']"></i>
+        </button>
+      </div>
     </nav>
 
-    <div class="absolute bottom-0 left-0 right-0 p-4 border-t" style="border-color: rgba(243, 232, 226, 0.2);">
+    <div class="p-4 border-t border-border-light">
       <button
         @click="navigate('/profile')"
         :class="[
-          'flex items-center w-full p-3 rounded-xl transition-all duration-300',
+          'flex items-center w-full p-3 transition-all duration-200',
           route.path === '/profile'
-            ? 'text-white'
-            : ''
+            ? 'bg-accent-blue-light text-accent-blue'
+            : 'hover:bg-bg-secondary text-text-secondary'
         ]"
-        :style="route.path === '/profile'
-          ? 'background-color: #D97706; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);'
-          : 'color: #2D2D2D;'
-        "
-        @mouseover="route.path !== '/profile' && (event.target.style.backgroundColor = 'rgba(243, 232, 226, 0.3)')"
-        @mouseout="route.path !== '/profile' && (event.target.style.backgroundColor = 'transparent')"
+        style="border-radius: 12px;"
       >
-        <i class="pi pi-user text-lg"></i>
-        <span v-if="open" class="ml-3 font-medium">Profile</span>
+        <div class="w-8 h-8 bg-accent-blue rounded-full flex items-center justify-center text-white font-semibold text-sm">
+          {{ authStore.user?.name?.charAt(0) || 'U' }}
+        </div>
+        <div v-if="open" class="ml-3 text-left">
+          <p class="text-sm font-medium text-text-primary">{{ authStore.user?.name }}</p>
+          <p class="text-xs text-text-tertiary capitalize">{{ authStore.user?.role?.replace('_', ' ') }}</p>
+        </div>
       </button>
     </div>
   </aside>
