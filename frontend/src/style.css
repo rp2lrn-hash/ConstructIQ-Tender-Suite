@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #F9FAFB;
+    color: #2D2D2D;
+  }
+
+  #app {
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .card-premium {
+    @apply bg-white rounded-2xl border;
+    border-color: rgba(243, 232, 226, 0.2);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .btn-neumorphic {
+    @apply px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105;
+    box-shadow: 8px 8px 16px #F3E8E2, -8px -8px 16px #F9FAFB;
+  }
+
+  .btn-neumorphic:hover {
+    box-shadow: 8px 8px 16px #d1d5db, -8px -8px 16px #ffffff;
+  }
+
+  .btn-neumorphic:active {
+    box-shadow: inset 8px 8px 16px #d1d5db, inset -8px -8px 16px #ffffff;
+  }
+
+  .kpi-card {
+    @apply bg-white rounded-2xl border p-6;
+    border-color: rgba(243, 232, 226, 0.2);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .gold-accent {
+    color: #D97706;
+  }
+
+  .gold-bg {
+    background-color: #D97706;
+  }
+}
