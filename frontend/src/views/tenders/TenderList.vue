@@ -52,23 +52,25 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div style="font-family: 'Montserrat', sans-serif;">
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h1 class="text-2xl font-bold text-text-primary">Tenders</h1>
-        <p class="text-text-secondary">Active Tenders: {{ tenders.length }}</p>
+        <h1 class="text-2xl font-bold" style="color: #212121;">Tenders</h1>
+        <p style="color: #666;">Active Tenders: {{ tenders.length }}</p>
       </div>
       <div class="flex items-center space-x-3">
         <button
           @click="showClosed = !showClosed"
-          class="btn-outline-lms"
+          class="px-4 py-2 text-sm font-bold transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
+          style="background: white; border: 2px solid #E0F2F7; color: #212121;"
         >
           {{ showClosed ? 'Hide Closed' : 'Show Closed' }}
         </button>
         <button
           v-if="authStore.isEvaluator"
           @click="handleCreate"
-          class="btn-primary-lms"
+          class="px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
+          style="background: linear-gradient(135deg, #2E64FE 0%, #00B4D8 100%);"
         >
           + New Tender
         </button>
@@ -76,33 +78,34 @@ onMounted(() => {
     </div>
 
     <div v-if="loading" class="flex items-center justify-center py-12">
-      <i class="pi pi-spinner pi-spin text-3xl text-text-muted"></i>
+      <i class="pi pi-spinner pi-spin text-3xl" style="color: #666;"></i>
     </div>
 
     <div v-else class="space-y-5">
       <div
         v-for="tender in tenders"
         :key="tender.id"
-        class="card-lms cursor-pointer relative overflow-hidden"
+        class="p-6 rounded-2xl pulse-glow transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer relative overflow-hidden"
+        style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);"
         @click="handleView(tender.id)"
       >
         <div class="absolute left-0 top-0 bottom-0 w-1" :style="{ background: getUrgencyGradient(tender.status) }"></div>
         
         <div class="grid grid-cols-5 gap-6 items-center pl-4">
           <div class="flex items-center">
-            <div class="w-12 h-12 flex items-center justify-center text-white" style="background: #005D6C; border-radius: 12px;">
+            <div class="w-12 h-12 flex items-center justify-center text-white rounded-xl icon-animate" style="background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);">
               <i class="pi pi-file text-lg"></i>
             </div>
           </div>
 
           <div>
-            <p class="text-base font-medium text-text-primary">{{ tender.title }}</p>
-            <p class="text-sm text-text-secondary">{{ tender.category }}</p>
+            <p class="text-base font-bold" style="color: #212121;">{{ tender.title }}</p>
+            <p class="text-sm" style="color: #666;">{{ tender.category }}</p>
           </div>
 
           <div>
-            <p class="text-xl font-bold text-text-primary">${{ tender.budget_range_min?.toLocaleString() || 0 }}</p>
-            <p class="text-sm text-text-secondary">Budget</p>
+            <p class="text-xl font-bold" style="color: #212121;">${{ tender.budget_range_min?.toLocaleString() || 0 }}</p>
+            <p class="text-sm" style="color: #666;">Budget</p>
           </div>
 
           <div>
@@ -113,8 +116,8 @@ onMounted(() => {
 
           <div class="flex items-center justify-end space-x-2">
             <button
-              class="text-sm font-medium transition-all duration-200"
-              style="color: #005D6C; padding: 8px 16px; border-radius: 8px;"
+              class="text-sm font-bold transition-all duration-200 px-4 py-2 rounded-xl hover:scale-105"
+              style="color: #2E64FE;"
               @click.stop="handleView(tender.id)"
             >
               View Details
@@ -122,7 +125,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="mt-4 pt-4 flex items-center space-x-6 text-sm text-text-secondary pl-4" style="border-top: 1.5px solid #E2E8ED;">
+        <div class="mt-4 pt-4 flex items-center space-x-6 text-sm pl-4" style="border-top: 1.5px solid #E0F2F7; color: #666;">
           <div class="flex items-center">
             <span class="w-2 h-2 rounded-full inline-block mr-2" style="background: #16A34A;"></span>
             {{ tender.status }}
@@ -135,3 +138,31 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style>
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.icon-animate {
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(46, 100, 254, 0.4);
+  }
+}
+
+.pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+</style>

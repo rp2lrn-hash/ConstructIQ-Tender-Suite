@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
-const auth = require('../middleware/auth');
+const { authenticate } = require('../middleware/auth');
 const { isAdmin, isEvaluator } = require('../middleware/rbac');
 const { tenantIsolation, auditLog } = require('../middleware/tenant');
 
-router.use(auth);
+router.use(authenticate);
 router.use(tenantIsolation);
 
 router.get('/users', isAdmin, adminController.getAllUsers);

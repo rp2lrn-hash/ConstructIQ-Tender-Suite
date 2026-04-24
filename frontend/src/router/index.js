@@ -149,6 +149,59 @@ const routes = [
           }
         ]
       },
+      // Questionnaire Routes
+      {
+        path: 'questionnaires',
+        meta: { requiresRole: ['admin', 'evaluator'] },
+        children: [
+          {
+            path: '',
+            name: 'Questionnaires',
+            component: () => import('@/views/questionnaires/QuestionnaireList.vue')
+          },
+          {
+            path: 'create',
+            name: 'CreateQuestionnaire',
+            component: () => import('@/views/questionnaires/QuestionnaireBuilder.vue')
+          },
+          {
+            path: ':id/edit',
+            name: 'EditQuestionnaire',
+            component: () => import('@/views/questionnaires/QuestionnaireBuilder.vue')
+          }
+        ]
+      },
+      // Response Routes
+      {
+        path: 'responses',
+        children: [
+          {
+            path: '',
+            name: 'Responses',
+            component: () => import('@/views/responses/ResponseOverview.vue')
+          },
+          {
+            path: ':id',
+            name: 'ResponseDetail',
+            component: () => import('@/views/responses/ResponseDetail.vue')
+          },
+          {
+            path: 'form/:questionnaireId',
+            name: 'ResponseForm',
+            component: () => import('@/views/responses/ResponseForm.vue')
+          },
+          {
+            path: 'form/:questionnaireId/:responseId',
+            name: 'EditResponseForm',
+            component: () => import('@/views/responses/ResponseForm.vue')
+          },
+          {
+            path: 'assignment/:assignmentId',
+            name: 'AssignmentResponseForm',
+            component: () => import('@/views/responses/ResponseForm.vue')
+          }
+        ]
+      },
       // Profile
       {
         path: 'profile',

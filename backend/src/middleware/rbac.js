@@ -12,6 +12,7 @@ const rbac = (allowedRoles) => {
   };
 };
 
+const authorize = rbac;
 const isAdmin = rbac(['admin']);
 const isEvaluator = rbac(['admin', 'evaluator']);
 const isVendor = rbac(['admin', 'vendor']);
@@ -20,6 +21,7 @@ const isAnyAuthenticated = rbac(['admin', 'evaluator', 'vendor', 'customer_user'
 
 module.exports = {
   rbac,
+  authorize,
   isAdmin,
   isEvaluator,
   isVendor,

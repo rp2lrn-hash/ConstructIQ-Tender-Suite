@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const evaluationController = require('../controllers/evaluationController');
-const auth = require('../middleware/auth');
+const { authenticate } = require('../middleware/auth');
 const { isEvaluator } = require('../middleware/rbac');
 const { tenantIsolation, auditLog } = require('../middleware/tenant');
 
-router.use(auth);
+router.use(authenticate);
 router.use(tenantIsolation);
 
 router.get('/', isEvaluator, evaluationController.getAllEvaluations);

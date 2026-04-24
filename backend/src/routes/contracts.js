@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const contractController = require('../controllers/contractController');
-const auth = require('../middleware/auth');
+const { authenticate } = require('../middleware/auth');
 const { isEvaluator } = require('../middleware/rbac');
 const { tenantIsolation, auditLog } = require('../middleware/tenant');
 const upload = require('../middleware/upload');
 
-router.use(auth);
+router.use(authenticate);
 router.use(tenantIsolation);
 
 router.get('/', isEvaluator, contractController.getAllContracts);

@@ -8,33 +8,44 @@ export default {
   theme: {
     extend: {
       colors: {
-        // LMS Teal Branding
-        'teal-primary': '#005D6C',
-        'teal-secondary': '#007B8F',
-        'teal-accent': '#009BAA',
-        'teal-soft': '#E8F4F6',
-        'teal-light': '#F0F9FB',
+        // Sneat Color Palette
+        'sneat-primary': '#696cff',
+        'sneat-primary-rgb': '105, 108, 255',
+        'sneat-secondary': '#8592a3',
+        'sneat-success': '#71dd37',
+        'sneat-info': '#03c3ec',
+        'sneat-warning': '#ffab00',
+        'sneat-danger': '#ff3e1d',
+        'sneat-dark': '#2b2c40',
+        'sneat-light': '#dbdee0',
+        'sneat-gray': '#91979f',
+        
+        // Sneat Gray Scale
+        'sneat-gray-25': '#fbfbfb',
+        'sneat-gray-60': '#f2f3f3',
+        'sneat-gray-80': '#edeef0',
+        'sneat-gray-100': '#e9eaec',
+        'sneat-gray-200': '#e4e6e8',
+        'sneat-gray-300': '#bdc1c5',
+        'sneat-gray-400': '#a7acb2',
+        'sneat-gray-500': '#91979f',
+        'sneat-gray-600': '#7a838b',
+        'sneat-gray-700': '#646e78',
+        'sneat-gray-800': '#4e5965',
+        'sneat-gray-900': '#384551',
         
         // Backgrounds
-        'bg-app': '#F7F9FA',
-        'bg-card': '#FFFFFF',
-        'bg-soft': '#E8F4F6',
+        'bg-body': '#f5f5f9',
+        'bg-paper': '#ffffff',
+        'bg-card': '#ffffff',
         
         // Text
-        'text-primary': '#1A2332',
-        'text-secondary': '#5A6E82',
-        'text-muted': '#94A3B8',
+        'text-body': '#646e78',
+        'text-heading': '#22303e',
+        'text-muted': '#a7acb2',
         
         // Borders
-        'border-default': '#E2E8ED',
-        
-        // Status Colors
-        'status-success': '#16A34A',
-        'status-success-bg': '#DCFCE7',
-        'status-error': '#DC2626',
-        'status-error-bg': '#FEE2E2',
-        'status-warning': '#D97706',
-        'status-warning-bg': '#FEF3C7',
+        'border-default': '#e4e6e8',
         
         // Legacy colors for compatibility
         'neutral-50': '#FAFAFA',
@@ -49,25 +60,27 @@ export default {
         'neutral-900': '#171717',
       },
       boxShadow: {
-        'card': '0 2px 6px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)',
-        'card-hover': '0 10px 25px rgba(0,0,0,0.06)',
-        'button': '0 4px 12px rgba(0,93,108,0.25)',
-        'button-hover': '0 6px 16px rgba(0,93,108,0.35)',
-        'navbar': '0 2px 6px rgba(0,0,0,0.04)',
+        'sneat': '0 0.1875rem 0.5rem 0 rgba(34, 48, 62, 0.1)',
+        'sneat-sm': '0 0.125rem 0.375rem 0 rgba(34, 48, 62, 0.08)',
+        'sneat-lg': '0 0.25rem 0.75rem 0 rgba(34, 48, 62, 0.14)',
+        'sneat-card': '0 0.1875rem 0.5rem 0 rgba(34, 48, 62, 0.1)',
       },
       borderRadius: {
-        'card': '14px',
-        'card-lg': '16px',
-        'button': '9px',
-        'tab': '8px',
-        'input': '22px',
-        'badge': '999px',
-        'pill': '999px',
+        'sneat': '0.375rem',
+        'sneat-sm': '0.25rem',
+        'sneat-lg': '0.5rem',
+      },
+      fontFamily: {
+        montserrat: ['Montserrat', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
+        opensans: ['Open Sans', 'sans-serif'],
+        'public': ['"Public Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Oxygen', 'Ubuntu', 'Cantarell', '"Fira Sans"', '"Droid Sans"', '"Helvetica Neue"', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.5s ease-out',
         'slide-in': 'slideIn 0.3s ease-out',
+        'scale-in': 'scaleIn 0.25s ease',
       },
       keyframes: {
         fadeIn: {
@@ -81,6 +94,10 @@ export default {
         slideIn: {
           '0%': { transform: 'translateX(-20px)', opacity: '0' },
           '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.95) translateY(-10px)' },
+          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
         },
       }
     },

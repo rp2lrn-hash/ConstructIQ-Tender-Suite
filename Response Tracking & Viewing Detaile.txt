@@ -1,0 +1,128 @@
+Response Tracking & Viewing: Detailed Breakdown
+This section is crucial for your internal team to understand the customer's needs and the progress of data collection.
+1. "Page to view all responses for a specific project/customer."
+Purpose: To give your team a centralized overview of all questionnaires linked to a particular project or customer, and their current status.
+Access Point: Typically accessed from a "Project Details" page or a "Customer Profile" page. There might be a dedicated "Responses" tab or section.
+Key Information Displayed:
+Questionnaire Name: (e.g., "Initial Project Discovery Call," "Client Requirements Form," "Post-Construction Feedback").
+Date Assigned/Sent: When the questionnaire was first linked to the project/customer.
+Last Updated/Submitted: The last time the customer (or an internal user) saved or submitted a response.
+Status (Visual Indicator): This is vital!
+"Not Started": The questionnaire has been assigned but no answers have been recorded.
+"In Progress": Some questions have been answered, but it's not complete.
+"Completed": All required questions have been answered and the customer has officially submitted it.
+"Overdue" (Optional): If you implement deadlines.
+"Reviewed" (Optional): After an internal team member has gone through the submitted responses.
+Submitted By: The customer contact who filled it out (if applicable) or the internal user.
+Actions: Links to "View Details," "Send Reminder," "Print," "Download PDF."
+Example UI Sketch:
+Imagine a table on a "Project XYZ Details" page:
+Questionnaire Title	Assigned Date	Last Updated	Status	Submitted By	Actions
+Initial Project Discovery Call	2024-03-01	2024-03-05	In Progress	John Doe	[View Details] [Send Reminder]
+Client Requirements Form	2024-03-02	2024-03-02	Not Started	-	[View Details] [Send Reminder]
+Materials Selection	2024-03-10	2024-03-12	Completed	Jane Smith	[View Details] [Download PDF]
+Post-Construction Feedback	2024-04-15	-	Not Started	-	[View Details] [Send Reminder]
+2. "Detailed view of a single submitted response, showing questions and answers."
+Purpose: To allow your team to read and analyze the specific answers provided by the customer for a particular questionnaire.
+Access Point: Clicking "View Details" from the list described above.
+Key Information Displayed:
+Header: Questionnaire Title, Project Name, Customer Name, Submission Date, Current Status.
+Question-Answer Pairs: For each question in the questionnaire, display:
+The exact question_text
+The customer's answer_text (or selected answer_value).
+Visually differentiate questions from answers (e.g., bold question, normal answer text).
+For multiple-choice questions, show which option(s) were selected.
+For file uploads (if you add this type later), show a link to the uploaded file.
+Internal Notes Section (Optional but Recommended): A textarea for internal team members to add notes, comments, or follow-up actions related to the response. This is crucial for collaborative project management.
+Audit Trail (Optional): Who viewed/edited this response last.
+Example UI Sketch (Conceptual):
+Questionnaire: Initial Project Discovery Call
+Project: Innovate Builders - New Office Fitout
+Customer: Innovate Builders Ltd.
+Submitted By: John Doe, Innovate Builders
+Submission Date: March 12, 2024
+Status: Completed
+1. What is the primary purpose of this construction project?
+Answer: To create a modern, collaborative workspace for our growing team of 50 employees, with potential to expand to 75 within 2 years.
+2. What is your estimated budget range for this project?
+Answer: $500,000 - $750,000
+3. Desired features (select all that apply):
+Answer:
+✅ Open-plan workspace
+✅ Private offices
+❌ Conference rooms (This would appear as unchecked/unselected)
+✅ Breakout areas
+✅ High-speed internet infrastructure
+✅ Energy-efficient lighting
+4. Are there any specific building codes or regulations we should be aware of?
+Answer: Yes, we are in a historic district, so facade preservation will be important. Also, local fire safety codes are quite strict for commercial buildings.
+Internal Notes:
+March 12, 2024 (Sarah M.): Budget seems reasonable. Need to follow up on historic district regulations and get clarification on "private offices" vs. "quiet rooms."
+March 13, 2024 (Tom K.): Checked facade regulations, will integrate into initial design brief.
+3. "Visual indicators of completion status."
+Implementation:
+Color-coding: Use green for "Completed," yellow/orange for "In Progress," red for "Not Started" or "Overdue."
+Icons: Checkmark for completed, clock for in-progress, empty circle for not started.
+Progress Bars: (Especially useful on the customer-facing side, but can also be shown for internal views for long questionnaires).
+Where to display:
+On the list of all responses for a project/customer.
+Prominently on the detailed single response view.
+On a main dashboard for an internal user, showing their assigned questionnaires and their status.
+Question Input and Response Flow: Detailed Breakdown
+This covers how you'll define the questions (internal user) and how customers will answer them.
+1. Inputting Questions (Internal User - Questionnaire Builder)
+This is handled by your "Questionnaire Management" UI.
+Page Structure: A dedicated "Questionnaire Builder" page where an admin or project manager can:
+Create New Questionnaire: Give it a title and description.
+Add Questions: For each question, they will specify:
+Question Text: The actual question (e.g., "What is your estimated project start date?").
+Question Type: This is critical!
+Text Input: Single line of text (e.g., "Company Name").
+Text Area: Multi-line text (e.g., "Project Description").
+Radio Buttons: Single choice from a list (e.g., "New Construction" / "Renovation" / "Extension").
+Checkboxes: Multiple choices from a list (e.g., "Desired Features").
+Dropdown/Select: Single choice from a long list.
+Date Picker: For selecting dates.
+Number Input: For numeric values.
+File Upload (Advanced): For documents, images, blueprints.
+Options (for Radio/Checkbox/Select types): A mechanism to add multiple choice options. (e.g., an "Add Option" button that creates a new text input field).
+Required Field: A toggle or checkbox to indicate if this question must be answered for submission.
+Order: Drag-and-drop functionality or simple up/down arrows to reorder questions within the questionnaire.
+Edit/Delete Questions: Self-explanatory.
+Activate/Deactivate Questionnaire: Control whether it's available for use.
+Preview: See what the questionnaire will look like to the customer.
+Database Interaction (Questions table):
+questionnaire_id: Links the question to its parent questionnaire.
+question_text: Stores the question string.
+question_type: Stores the type identifier ('text', 'radio', 'checkbox', etc.).
+options: For multiple-choice types, this will likely be a JSON array or a comma-separated string storing the selectable options. Example: ["New Construction", "Renovation", "Extension"].
+is_required: Boolean (true/false).
+order_index: Integer for display order.
+2. How the Response Will Be Captured (Customer-Facing Interface)
+This is the interactive form the customer fills out.
+Generation: When a customer (or internal user on behalf of a customer) accesses a questionnaire, the frontend fetches all questions associated with that questionnaire_id from the backend.
+Dynamic Rendering: The frontend then iterates through the questions and dynamically renders the appropriate HTML input field based on the question_type:
+If question_type is 'text', render <input type="text">.
+If question_type is 'textarea', render <textarea>.
+If question_type is 'radio', render a group of <input type="radio"> elements, using the options data for labels.
+If question_type is 'checkbox', render a group of <input type="checkbox"> elements.
+And so on for other types.
+Saving Progress:
+"Save & Continue Later" button: Allows customers to save partial responses without submitting. This is crucial for long forms.
+Auto-save (Advanced): Periodically save answers in the background as the user types.
+Submission:
+A "Submit" button, which only becomes active once all is_required fields are filled.
+On submission, the form data is sent to your backend API.
+Database Interaction (Responses and Answer_Details tables):
+When the customer starts or saves:
+An entry is created/updated in the Responses table (linked to project_id, customer_id, questionnaire_id, and status set to 'In Progress').
+For each question the customer answers:
+An entry is created/updated in the Answer_Details table:
+response_id: Links to the overall response.
+question_id: Links to the specific question definition.
+answer_text: Stores the raw text entered (for text/textarea).
+answer_value: For numeric, date, or selected option values (e.g., if a radio button had a value like "NC" instead of "New Construction"). For checkboxes, it might store a JSON array of selected values.
+When the customer submits:
+The status in the Responses table is updated to 'Completed'.
+Potentially, an email notification is sent to internal team members.
+

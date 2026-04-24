@@ -1,39 +1,25 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import Sidebar from '@/components/Sidebar.vue'
 import Navbar from '@/components/Navbar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const sidebarOpen = ref(true)
 
 const handleLogout = () => {
   authStore.logout()
   router.push('/login')
 }
-
-const toggleSidebar = () => {
-  sidebarOpen.value = !sidebarOpen.value
-}
 </script>
 
 <template>
-  <div class="flex h-screen" style="background: #F7F9FA;">
-    <Sidebar :open="sidebarOpen" @toggle="toggleSidebar" class="relative z-10" />
-    
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <Navbar 
-        :user="authStore.user" 
-        :sidebar-open="sidebarOpen"
-        @toggle-sidebar="toggleSidebar"
-        @logout="handleLogout"
-      />
-      
-      <main class="flex-1 overflow-y-auto p-6">
+  <div class="min-h-screen relative overflow-hidden" style="background: linear-gradient(135deg, #F8FCFF 0%, #E0F2F7 100%); font-family: 'Montserrat', sans-serif;">
+    <Navbar :user="authStore.user" @logout="handleLogout" />
+    <main class="px-8 py-8 relative z-10 overflow-y-auto">
+      <div class="max-w-7xl w-full mx-auto">
         <router-view />
-      </main>
-    </div>
+      </div>
+    </main>
   </div>
 </template>
