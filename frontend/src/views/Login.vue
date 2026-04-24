@@ -34,11 +34,11 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center px-4 animate-fade-in" style="background: #F8FAFC;">
+  <div class="min-h-screen flex items-center justify-center px-4 animate-fade-in" style="background: #F7F9FA;">
     <div class="max-w-md w-full">
-      <div class="bg-white border border-border-light p-8 animate-slide-up card-premium" style="border-radius: 16px;">
+      <div class="card-lms animate-slide-up">
         <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style="background: #3B82F6;">
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style="background: linear-gradient(135deg, #005D6C, #007B8F, #009BAA);">
             <i class="pi pi-box text-4xl text-white"></i>
           </div>
           <h1 class="text-3xl font-bold text-text-primary">PROLOGISTIC</h1>
@@ -58,7 +58,7 @@ const handleLogin = async () => {
               class="w-full"
               autocomplete="email"
               required
-              style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 22px; padding: 12px;"
+              style="background: #F7F9FA; border: 1.5px solid #E2E8ED; border-radius: 22px; padding: 12px;"
             />
           </div>
 
@@ -75,26 +75,25 @@ const handleLogin = async () => {
               toggleMask
               autocomplete="current-password"
               required
-              input-style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 22px; padding: 12px;"
+              input-style="background: #F7F9FA; border: 1.5px solid #E2E8ED; border-radius: 22px; padding: 12px;"
             />
           </div>
 
-          <div v-if="error" class="p-4 bg-status-red-light text-status-red" style="border-radius: 12px;">
+          <div v-if="error" class="p-4 text-status-error" style="background: #FEE2E2; border-radius: 12px;">
             {{ error }}
           </div>
 
           <button
             type="submit"
             :disabled="loading"
-            class="w-full text-white font-medium transition-all duration-200 hover:opacity-90"
-            style="background: #3B82F6; border-radius: 12px; padding: 0.75rem 1.5rem;"
+            class="w-full btn-primary-lms"
           >
             {{ loading ? 'Signing in...' : 'Sign In' }}
           </button>
         </form>
 
         <div class="mt-6 text-center">
-          <p class="text-sm text-text-tertiary">
+          <p class="text-sm text-text-muted">
             Demo credentials: admin@acme.com / Admin@123
           </p>
         </div>

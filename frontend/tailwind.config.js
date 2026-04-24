@@ -8,7 +8,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Soft neutral tones
+        // LMS Teal Branding
+        'teal-primary': '#005D6C',
+        'teal-secondary': '#007B8F',
+        'teal-accent': '#009BAA',
+        'teal-soft': '#E8F4F6',
+        'teal-light': '#F0F9FB',
+        
+        // Backgrounds
+        'bg-app': '#F7F9FA',
+        'bg-card': '#FFFFFF',
+        'bg-soft': '#E8F4F6',
+        
+        // Text
+        'text-primary': '#1A2332',
+        'text-secondary': '#5A6E82',
+        'text-muted': '#94A3B8',
+        
+        // Borders
+        'border-default': '#E2E8ED',
+        
+        // Status Colors
+        'status-success': '#16A34A',
+        'status-success-bg': '#DCFCE7',
+        'status-error': '#DC2626',
+        'status-error-bg': '#FEE2E2',
+        'status-warning': '#D97706',
+        'status-warning-bg': '#FEF3C7',
+        
+        // Legacy colors for compatibility
         'neutral-50': '#FAFAFA',
         'neutral-100': '#F5F5F5',
         'neutral-200': '#E5E5E5',
@@ -19,46 +47,22 @@ export default {
         'neutral-700': '#404040',
         'neutral-800': '#262626',
         'neutral-900': '#171717',
-        
-        // Traffic-light status colors
-        'status-green': '#22C55E',
-        'status-green-light': '#DCFCE7',
-        'status-yellow': '#EAB308',
-        'status-yellow-light': '#FEF9C3',
-        'status-red': '#EF4444',
-        'status-red-light': '#FEE2E2',
-        
-        // Accent colors
-        'accent-blue': '#3B82F6',
-        'accent-blue-light': '#DBEAFE',
-        'accent-purple': '#8B5CF6',
-        'accent-purple-light': '#EDE9FE',
-        
-        // Backgrounds
-        'bg-primary': '#FFFFFF',
-        'bg-secondary': '#F8FAFC',
-        'bg-tertiary': '#F1F5F9',
-        
-        // Text
-        'text-primary': '#0F172A',
-        'text-secondary': '#475569',
-        'text-tertiary': '#94A3B8',
-        
-        // Borders
-        'border-light': '#E2E8F0',
-        'border-medium': '#CBD5E1',
       },
       boxShadow: {
         'card': '0 2px 6px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)',
-        'card-hover': '0 12px 32px rgba(0,0,0,0.10)',
-        'button': '0 6px 18px rgba(43,182,115,0.35)',
-        'button-hover': '0 10px 24px rgba(43,182,115,0.45)',
+        'card-hover': '0 10px 25px rgba(0,0,0,0.06)',
+        'button': '0 4px 12px rgba(0,93,108,0.25)',
+        'button-hover': '0 6px 16px rgba(0,93,108,0.35)',
+        'navbar': '0 2px 6px rgba(0,0,0,0.04)',
       },
       borderRadius: {
         'card': '14px',
-        'button': '12px',
+        'card-lg': '16px',
+        'button': '9px',
+        'tab': '8px',
         'input': '22px',
         'badge': '999px',
+        'pill': '999px',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

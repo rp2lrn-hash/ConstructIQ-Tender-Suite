@@ -53,21 +53,21 @@ const navigate = (path) => {
       'text-text-primary transition-all duration-300 flex flex-col relative z-10 bg-white',
       open ? 'w-[260px]' : 'w-20'
     ]"
-    style="height: 100vh; border-right: 1px solid #E2E8F0;"
+    style="height: 100vh; border-right: 1.5px solid #E2E8ED;"
   >
-    <div class="p-6 border-b border-border-light">
+    <div class="p-6 border-b" style="border-color: #E2E8ED;">
       <h1 v-if="open" class="text-xl font-bold leading-tight text-text-primary">
         PROLOGISTIC
         <span class="block text-sm font-normal text-text-secondary">LOGISTICS</span>
       </h1>
       <div v-else class="text-center">
-        <i class="pi pi-box text-2xl text-text-primary"></i>
+        <i class="pi pi-box text-2xl text-teal-primary"></i>
       </div>
     </div>
 
     <nav class="flex-1 p-4 space-y-6 overflow-y-auto">
       <div v-if="open">
-        <p class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">Main</p>
+        <p class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Main</p>
         <div class="space-y-2">
           <button
             v-for="item in menuItems.filter(i => ['/', '/tenders'].includes(i.path))"
@@ -76,20 +76,20 @@ const navigate = (path) => {
             :class="[
               'flex items-center w-full p-3 transition-all duration-200',
               route.path === item.path
-                ? 'bg-accent-blue-light text-accent-blue'
-                : 'hover:bg-bg-secondary text-text-secondary'
+                ? 'bg-teal-soft text-teal-primary'
+                : 'hover:bg-teal-light text-text-secondary'
             ]"
-            style="border-radius: 12px;"
+            style="border-radius: 8px;"
           >
             <i :class="[item.icon, 'text-lg']"></i>
             <span class="ml-3 font-medium">{{ item.label }}</span>
-            <span v-if="item.path === '/tenders'" class="ml-auto bg-status-red text-white text-xs px-2 py-0.5" style="border-radius: 999px;">32</span>
+            <span v-if="item.path === '/tenders'" class="ml-auto text-white text-xs px-2 py-0.5" style="background: #005D6C; border-radius: 999px;">32</span>
           </button>
         </div>
       </div>
 
       <div v-if="open && authStore.isEvaluator">
-        <p class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">Finance</p>
+        <p class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Finance</p>
         <div class="space-y-2">
           <button
             v-for="item in menuItems.filter(i => ['/evaluations', '/contracts'].includes(i.path))"
@@ -98,10 +98,10 @@ const navigate = (path) => {
             :class="[
               'flex items-center w-full p-3 transition-all duration-200',
               route.path === item.path
-                ? 'bg-accent-blue-light text-accent-blue'
-                : 'hover:bg-bg-secondary text-text-secondary'
+                ? 'bg-teal-soft text-teal-primary'
+                : 'hover:bg-teal-light text-text-secondary'
             ]"
-            style="border-radius: 12px;"
+            style="border-radius: 8px;"
           >
             <i :class="[item.icon, 'text-lg']"></i>
             <span class="ml-3 font-medium">{{ item.label }}</span>
@@ -110,7 +110,7 @@ const navigate = (path) => {
       </div>
 
       <div v-if="open && authStore.isAdmin">
-        <p class="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">Admin</p>
+        <p class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Admin</p>
         <div class="space-y-2">
           <button
             v-for="item in menuItems.filter(i => ['/admin/users', '/admin/customers', '/admin/audit-logs'].includes(i.path))"
@@ -119,10 +119,10 @@ const navigate = (path) => {
             :class="[
               'flex items-center w-full p-3 transition-all duration-200',
               route.path === item.path
-                ? 'bg-accent-blue-light text-accent-blue'
-                : 'hover:bg-bg-secondary text-text-secondary'
+                ? 'bg-teal-soft text-teal-primary'
+                : 'hover:bg-teal-light text-text-secondary'
             ]"
-            style="border-radius: 12px;"
+            style="border-radius: 8px;"
           >
             <i :class="[item.icon, 'text-lg']"></i>
             <span class="ml-3 font-medium">{{ item.label }}</span>
@@ -138,33 +138,33 @@ const navigate = (path) => {
             :class="[
               'flex items-center justify-center w-full p-3 transition-all duration-200',
               route.path === item.path
-                ? 'bg-accent-blue-light text-accent-blue'
-                : 'hover:bg-bg-secondary text-text-secondary'
+                ? 'bg-teal-soft text-teal-primary'
+                : 'hover:bg-teal-light text-text-secondary'
             ]"
-            style="border-radius: 12px;"
+            style="border-radius: 8px;"
         >
           <i :class="[item.icon, 'text-lg']"></i>
         </button>
       </div>
     </nav>
 
-    <div class="p-4 border-t border-border-light">
+    <div class="p-4 border-t" style="border-color: #E2E8ED;">
       <button
         @click="navigate('/profile')"
         :class="[
           'flex items-center w-full p-3 transition-all duration-200',
           route.path === '/profile'
-            ? 'bg-accent-blue-light text-accent-blue'
-            : 'hover:bg-bg-secondary text-text-secondary'
+            ? 'bg-teal-soft text-teal-primary'
+            : 'hover:bg-teal-light text-text-secondary'
         ]"
-        style="border-radius: 12px;"
+        style="border-radius: 8px;"
       >
-        <div class="w-8 h-8 bg-accent-blue rounded-full flex items-center justify-center text-white font-semibold text-sm">
+        <div class="w-8 h-8 flex items-center justify-center text-white font-semibold text-sm" style="background: #005D6C; border-radius: 999px;">
           {{ authStore.user?.name?.charAt(0) || 'U' }}
         </div>
         <div v-if="open" class="ml-3 text-left">
           <p class="text-sm font-medium text-text-primary">{{ authStore.user?.name }}</p>
-          <p class="text-xs text-text-tertiary capitalize">{{ authStore.user?.role?.replace('_', ' ') }}</p>
+          <p class="text-xs text-text-muted capitalize">{{ authStore.user?.role?.replace('_', ' ') }}</p>
         </div>
       </button>
     </div>

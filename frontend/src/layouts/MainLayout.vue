@@ -20,7 +20,7 @@ const toggleSidebar = () => {
 </script>
 
 <template>
-  <div class="flex h-screen" style="background: linear-gradient(180deg, #F6F9FC 0%, #EEF3F8 100%);">
+  <div class="flex h-screen" style="background: #F7F9FA;">
     <Sidebar :open="sidebarOpen" @toggle="toggleSidebar" class="relative z-10" />
     
     <div class="flex-1 flex flex-col overflow-hidden">

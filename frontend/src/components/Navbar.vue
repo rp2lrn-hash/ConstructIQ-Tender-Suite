@@ -16,13 +16,13 @@ const toggleUserMenu = () => {
 </script>
 
 <template>
-  <header class="px-6 h-[70px] flex items-center sticky top-0 z-20 bg-white border-b border-border-light">
+  <header class="px-6 h-[56px] flex items-center sticky top-0 z-20 bg-white" style="border-bottom: 1.5px solid #E2E8ED; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
     <div class="flex items-center justify-between w-full">
       <div class="flex items-center space-x-4">
         <button
           @click="emit('toggle-sidebar')"
-          class="p-2 transition-all duration-200 text-text-primary hover:bg-bg-secondary"
-          style="border-radius: 12px;"
+          class="p-2 transition-all duration-200 text-text-primary hover:bg-teal-light"
+          style="border-radius: 8px;"
         >
           <i :class="['pi', sidebarOpen ? 'pi-angle-left' : 'pi-angle-right', 'text-lg']"></i>
         </button>
@@ -37,46 +37,47 @@ const toggleUserMenu = () => {
             type="text"
             placeholder="Search..."
             class="h-10 px-4 w-64 text-sm focus:outline-none transition-all duration-200 text-text-primary"
-            style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 22px;"
+            style="background: #F7F9FA; border: 1.5px solid #E2E8ED; border-radius: 22px;"
           />
         </div>
 
         <button
-          class="px-5 h-10 text-white font-medium transition-all duration-200 hover:opacity-90"
-          style="background: #3B82F6; border-radius: 12px;"
+          class="text-white font-medium transition-all duration-200"
+          style="background: linear-gradient(135deg, #005D6C, #007B8F, #009BAA); border-radius: 9px; padding: 10px 16px; box-shadow: 0 4px 12px rgba(0,93,108,0.25);"
         >
           + New Tender
         </button>
 
-        <button class="relative p-2 transition-all duration-200 text-text-primary hover:bg-bg-secondary" style="border-radius: 12px;">
+        <button class="relative p-2 transition-all duration-200 text-text-primary hover:bg-teal-light" style="border-radius: 8px;">
           <i class="pi pi-bell text-lg"></i>
-          <span class="absolute top-1 right-1 w-2 h-2 bg-status-red rounded-full"></span>
+          <span class="absolute top-1 right-1 w-2 h-2 rounded-full" style="background: #DC2626;"></span>
         </button>
 
         <div class="relative">
           <button
             @click="toggleUserMenu"
-            class="flex items-center space-x-3 p-2 transition-all duration-200 hover:bg-bg-secondary"
-            style="border-radius: 12px;"
+            class="flex items-center space-x-3 p-2 transition-all duration-200 hover:bg-teal-light"
+            style="border-radius: 8px;"
           >
-            <div class="w-10 h-10 flex items-center justify-center text-white font-semibold" style="background: #3B82F6; border-radius: 12px;">
+            <div class="w-10 h-10 flex items-center justify-center text-white font-semibold" style="background: #005D6C; border-radius: 999px;">
               {{ user?.name?.charAt(0) || 'U' }}
             </div>
             <div v-if="user" class="text-left">
               <p class="text-sm font-medium text-text-primary">{{ user.name }}</p>
-              <p class="text-xs text-text-tertiary capitalize">{{ user.role?.replace('_', ' ') }}</p>
+              <p class="text-xs text-text-muted capitalize">{{ user.role?.replace('_', ' ') }}</p>
             </div>
-            <i class="pi pi-chevron-down text-text-tertiary"></i>
+            <i class="pi pi-chevron-down text-text-muted"></i>
           </button>
 
           <div
             v-if="showUserMenu"
-            class="absolute right-0 mt-2 w-48 bg-white py-2 z-50 border border-border-light shadow-lg"
-            style="border-radius: 12px;"
+            class="absolute right-0 mt-2 w-48 bg-white py-2 z-50 shadow-lg"
+            style="border: 1.5px solid #E2E8ED; border-radius: 12px;"
           >
             <button
               @click="emit('logout')"
-              class="w-full px-4 py-2 text-left text-status-red hover:bg-bg-secondary transition-colors flex items-center"
+              class="w-full px-4 py-2 text-left transition-colors flex items-center"
+              style="color: #DC2626;"
             >
               <i class="pi pi-sign-out mr-2"></i>
               Logout

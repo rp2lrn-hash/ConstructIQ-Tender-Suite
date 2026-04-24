@@ -7,21 +7,29 @@ const props = defineProps({
 })
 
 const badgeStyles = {
-  danger: 'bg-status-red-light text-status-red',
-  warning: 'bg-status-yellow-light text-status-yellow',
-  neutral: 'bg-neutral-100 text-text-secondary',
-  success: 'bg-status-green-light text-status-green',
-  info: 'bg-accent-blue-light text-accent-blue'
+  danger: 'text-status-error',
+  warning: 'text-status-warning',
+  neutral: 'text-text-secondary',
+  success: 'text-status-success',
+  info: 'text-teal-primary'
+}
+
+const badgeBgStyles = {
+  danger: 'bg-status-error-bg',
+  warning: 'bg-status-warning-bg',
+  neutral: 'bg-neutral-100',
+  success: 'bg-status-success-bg',
+  info: 'bg-teal-soft'
 }
 </script>
 
 <template>
   <span 
     :class="[
-      'px-3 py-1 text-xs font-medium',
-      badgeStyles[status] || badgeStyles.neutral
+      'badge-lms',
+      badgeStyles[status] || badgeStyles.neutral,
+      badgeBgStyles[status] || badgeBgStyles.neutral
     ]"
-    style="border-radius: 999px;"
   >
     <slot />
   </span>
