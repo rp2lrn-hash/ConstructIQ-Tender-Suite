@@ -41,7 +41,7 @@ const handleLogin = async () => {
           <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style="background: linear-gradient(135deg, #005D6C, #007B8F, #009BAA);">
             <i class="pi pi-box text-4xl text-white"></i>
           </div>
-          <h1 class="text-3xl font-bold text-text-primary">PROLOGISTIC</h1>
+          <h1 class="text-3xl font-bold text-text-primary">ConstructIQ Tender Suite</h1>
           <p class="text-text-secondary mt-2">Tender Management System</p>
         </div>
 
