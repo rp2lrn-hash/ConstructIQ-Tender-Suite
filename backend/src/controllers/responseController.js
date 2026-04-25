@@ -1,4 +1,4 @@
-const { Response, AnswerDetail, Questionnaire, Question, User, Customer, Tender } = require('../models');
+const { Response, AnswerDetail, Questionnaire, Question, User, Customer, Tender, Assignment } = require('../models');
 
 // Create a new response
 exports.createResponse = async (req, res) => {
@@ -31,10 +31,10 @@ exports.createResponse = async (req, res) => {
     // Fetch complete response
     const completeResponse = await Response.findByPk(response.id, {
       include: [
-        { model: AnswerDetail, include: [{ model: Question }] },
-        { model: Questionnaire },
+        { model: AnswerDetail, as: 'answer_details', include: [{ model: Question, as: 'question' }] },
+        { model: Questionnaire, as: 'questionnaire' },
         { model: Tender, as: 'project', attributes: ['id', 'title'] },
-        { model: Customer, attributes: ['id', 'name'] },
+        { model: Customer, as: 'customer', attributes: ['id', 'name'] },
         { model: User, as: 'submitter', attributes: ['id', 'name', 'email'] }
       ]
     });
@@ -60,11 +60,15 @@ exports.getAllResponses = async (req, res) => {
     const responses = await Response.findAll({
       where,
       include: [
-        { model: AnswerDetail, include: [{ model: Question }] },
-        { model: Questionnaire, attributes: ['id', 'title'] },
+        { model: AnswerDetail, as: 'answer_details', include: [{ model: Question, as: 'question' }] },
+        { model: Questionnaire, as: 'questionnaire', attributes: ['id', 'title'], include: [{ model: Question, as: 'questions', attributes: ['id'] }] },
         { model: Tender, as: 'project', attributes: ['id', 'title'] },
-        { model: Customer, attributes: ['id', 'name'] },
-        { model: User, as: 'submitter', attributes: ['id', 'name', 'email'] }
+        { model: Customer, as: 'customer', attributes: ['id', 'name'] },
+        { model: User, as: 'submitter', attributes: ['id', 'name', 'email'] },
+        { model: Assignment, as: 'assignment', attributes: ['id', 'created_at', 'due_date', 'status'], include: [
+          { model: User, as: 'assignee', attributes: ['id', 'name', 'email'] },
+          { model: User, as: 'assigner', attributes: ['id', 'name', 'email'] }
+        ]}
       ],
       order: [['last_updated', 'DESC']]
     });
@@ -82,11 +86,15 @@ exports.getResponseById = async (req, res) => {
 
     const response = await Response.findByPk(id, {
       include: [
-        { model: AnswerDetail, include: [{ model: Question }] },
-        { model: Questionnaire, attributes: ['id', 'title'] },
+        { model: AnswerDetail, as: 'answer_details', include: [{ model: Question, as: 'question' }] },
+        { model: Questionnaire, as: 'questionnaire', attributes: ['id', 'title'], include: [{ model: Question, as: 'questions', attributes: ['id'] }] },
         { model: Tender, as: 'project', attributes: ['id', 'title'] },
-        { model: Customer, attributes: ['id', 'name'] },
-        { model: User, as: 'submitter', attributes: ['id', 'name', 'email'] }
+        { model: Customer, as: 'customer', attributes: ['id', 'name'] },
+        { model: User, as: 'submitter', attributes: ['id', 'name', 'email'] },
+        { model: Assignment, as: 'assignment', include: [
+          { model: User, as: 'assignee', attributes: ['id', 'name', 'email'] },
+          { model: User, as: 'assigner', attributes: ['id', 'name', 'email'] }
+        ]}
       ]
     });
 
@@ -104,7 +112,7 @@ exports.getResponseById = async (req, res) => {
 exports.updateResponse = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, answers, internal_notes } = req.body;
+    const { status, answers, internal_notes, assignment_id } = req.body;
 
     const response = await Response.findByPk(id);
     if (!response) {
@@ -115,7 +123,8 @@ exports.updateResponse = async (req, res) => {
       status: status || response.status,
       internal_notes: internal_notes !== undefined ? internal_notes : response.internal_notes,
       last_updated: new Date(),
-      submitted_date: status === 'completed' ? new Date() : response.submitted_date
+      submitted_date: status === 'completed' ? new Date() : response.submitted_date,
+      assignment_id: assignment_id !== undefined ? assignment_id : response.assignment_id
     });
 
     // Update answers if provided
@@ -137,8 +146,8 @@ exports.updateResponse = async (req, res) => {
     // Fetch updated response
     const updatedResponse = await Response.findByPk(id, {
       include: [
-        { model: AnswerDetail, include: [{ model: Question }] },
-        { model: Questionnaire, attributes: ['id', 'title'] }
+        { model: AnswerDetail, as: 'answer_details', include: [{ model: Question, as: 'question' }] },
+        { model: Questionnaire, as: 'questionnaire', attributes: ['id', 'title'] }
       ]
     });
 

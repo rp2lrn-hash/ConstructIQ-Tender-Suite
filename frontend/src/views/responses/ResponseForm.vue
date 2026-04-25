@@ -23,16 +23,13 @@ const fetchAssignment = async () => {
     const response_data = await api.get(`/assignments/${route.params.assignmentId}`)
     assignment.value = response_data.data
     isAssignmentMode.value = true
-    
-    // Fetch questionnaire from assignment
     await fetchQuestionnaire(assignment.value.questionnaire.id)
-    
-    // Check if there's an existing response for this assignment
-    // For now, we'll create a new response
   } catch (error) {
     console.error('Failed to fetch assignment:', error)
     alert('Failed to load assignment')
     router.push('/responses')
+  } finally {
+    loading.value = false
   }
 }
 
@@ -43,7 +40,8 @@ const fetchQuestionnaire = async (questionnaireId = null) => {
     questionnaire.value = response_data.data
 
     // Initialize answers object
-    questionnaire.value.questions.forEach(q => {
+    const qs = questionnaire.value.questions || questionnaire.value.Questions || []
+    qs.forEach(q => {
       answers.value[q.id] = {
         question_id: q.id,
         answer_text: '',
@@ -88,7 +86,8 @@ const fetchExistingResponse = async () => {
 
 const calculateProgress = () => {
   if (!questionnaire.value) return 0
-  const totalQuestions = questionnaire.value.Questions.length
+  const qs = questionnaire.value.questions || questionnaire.value.Questions || []
+  const totalQuestions = qs.length
   const answeredQuestions = Object.values(answers.value).filter(a => {
     return a.answer_text || (a.answer_value && a.answer_value.length > 0) || a.file_path
   }).length
@@ -97,7 +96,7 @@ const calculateProgress = () => {
 
 const canSubmit = computed(() => {
   if (!questionnaire.value) return false
-  const requiredQuestions = questionnaire.value.Questions.filter(q => q.is_required)
+  const requiredQuestions = (questionnaire.value.questions || questionnaire.value.Questions || []).filter(q => q.is_required)
   for (const q of requiredQuestions) {
     const answer = answers.value[q.id]
     if (!answer || (!answer.answer_text && !answer.answer_value && !answer.file_path)) {
@@ -134,7 +133,8 @@ const autoSave = async () => {
   try {
     const payload = {
       questionnaire_id: questionnaire.value.id,
-      answers: Object.values(answers.value)
+      answers: Object.values(answers.value),
+      ...(isAssignmentMode.value && assignment.value ? { assignment_id: assignment.value.id } : {})
     }
 
     if (response.value) {
@@ -178,7 +178,7 @@ const submitResponse = async () => {
     const payload = {
       questionnaire_id: questionnaire.value.id,
       answers: Object.values(answers.value),
-      status: 'submitted'
+      status: 'completed'
     }
 
     // If in assignment mode, link to assignment
@@ -202,7 +202,8 @@ const submitResponse = async () => {
     router.push('/responses')
   } catch (error) {
     console.error('Failed to submit response:', error)
-    alert('Failed to submit response')
+    const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Unknown error'
+    alert(`Failed to submit response: ${msg}`)
   } finally {
     saving.value = false
   }
@@ -256,7 +257,7 @@ const cancel = () => {
       <!-- Questions -->
       <div class="space-y-6">
         <div
-          v-for="question in questionnaire.Questions"
+          v-for="question in (questionnaire.questions || questionnaire.Questions || [])"
           :key="question.id"
           class="p-6 rounded-2xl pulse-glow transition-all duration-300 hover:shadow-xl hover:scale-105"
           style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);"

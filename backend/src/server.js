@@ -11,17 +11,22 @@ const specs = require('./swagger');
 
 const app = express();
 
+// Trust proxy (needed when behind Vite dev proxy)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 app.use(cors());
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 500,
-  message: 'Too many requests from this IP, please try again later.'
-});
-app.use('/api/', limiter);
+// Rate limiting — skip in development (Vite proxy makes all requests appear from 127.0.0.1)
+if (config.nodeEnv === 'production') {
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 2000,
+    message: 'Too many requests from this IP, please try again later.'
+  });
+  app.use('/api/', limiter);
+}
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));

@@ -19,7 +19,8 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({ error: 'User not found' });
     }
     
-    req.user = { id: user.id, role: user.role };
+    req.user = { id: user.id, role: user.role, customer_id: user.customer_id };
+    req.customerId = user.customer_id;
     next();
   } catch (error) {
     res.status(401).json({ error: 'Token is not valid' });

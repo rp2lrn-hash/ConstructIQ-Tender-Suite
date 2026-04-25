@@ -27,6 +27,9 @@ api.interceptors.response.use(
       localStorage.removeItem('token')
       window.location.href = '/login'
     }
+    if (error.response?.status === 429) {
+      error.message = 'Too many requests — please wait a moment and try again.'
+    }
     return Promise.reject(error)
   }
 )

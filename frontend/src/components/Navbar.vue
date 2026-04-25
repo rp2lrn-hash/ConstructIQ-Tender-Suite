@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 
@@ -11,22 +11,48 @@ const props = defineProps({
 const emit = defineEmits(['logout'])
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const showUserMenu = ref(false)
 const showNotifications = ref(false)
 const showNavMenu = ref(false)
+const bellRef = ref(null)
+const userRef = ref(null)
+const bellRect = ref({})
+const userRect = ref({})
+
+const updateRects = () => {
+  if (bellRef.value) bellRect.value = bellRef.value.getBoundingClientRect()
+  if (userRef.value) userRect.value = userRef.value.getBoundingClientRect()
+}
+
+const notifStyle = computed(() => ({
+  position: 'fixed',
+  top: (bellRect.value.bottom || 0) + 8 + 'px',
+  right: (window.innerWidth - (bellRect.value.right || 0)) + 'px',
+  width: '320px'
+}))
+
+const userMenuStyle = computed(() => ({
+  position: 'fixed',
+  top: (userRect.value.bottom || 0) + 8 + 'px',
+  right: (window.innerWidth - (userRect.value.right || 0)) + 'px',
+  width: '176px'
+}))
 const notifications = ref([])
 const unreadCount = ref(0)
 const loadingNotifications = ref(false)
 
 const toggleUserMenu = () => {
+  updateRects()
   showUserMenu.value = !showUserMenu.value
   showNotifications.value = false
   showNavMenu.value = false
 }
 
 const toggleNotifications = () => {
+  updateRects()
   showNotifications.value = !showNotifications.value
   showUserMenu.value = false
   showNavMenu.value = false
@@ -71,11 +97,16 @@ const markAsRead = async (notification) => {
   try {
     await api.patch(`/notifications/${notification.id}/read`)
     notification.is_read = true
-    fetchUnreadCount()
-    
-    // Navigate to response form if it's an assignment notification
-    if (notification.type === 'assignment' && notification.related_id) {
-      router.push(`/responses/assignment/${notification.related_id}`)
+    unreadCount.value = Math.max(0, unreadCount.value - 1)
+
+    // Close dropdown first, then navigate
+    if (notification.related_id) {
+      showNotifications.value = false
+      if (notification.type === 'assignment') {
+        await router.push(`/responses/assignment/${notification.related_id}`)
+      } else if (notification.type === 'response_submitted') {
+        await router.push(`/responses/${notification.related_id}`)
+      }
     }
   } catch (error) {
     console.error('Failed to mark notification as read:', error)
@@ -117,9 +148,26 @@ const handleLogout = async () => {
   await router.push('/login')
 }
 
+watch(() => route.path, () => {
+  showUserMenu.value = false
+  showNotifications.value = false
+  showNavMenu.value = false
+})
+
+const closeAll = () => {
+  showUserMenu.value = false
+  showNotifications.value = false
+  showNavMenu.value = false
+}
+
 onMounted(() => {
   fetchUnreadCount()
   setInterval(fetchUnreadCount, 60000)
+  document.addEventListener('click', closeAll)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', closeAll)
 })
 </script>
 
@@ -128,53 +176,57 @@ onMounted(() => {
 
     <!-- Notifications -->
     <div class="relative">
-      <button @click="toggleNotifications" class="icon-btn relative">
+      <button ref="bellRef" @click.stop="toggleNotifications" class="icon-btn relative">
         <i class="pi pi-bell"></i>
         <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
       </button>
-      <transition name="dropdown">
-        <div v-if="showNotifications" class="dropdown-panel w-80" style="right:0; top:100%;" @click.stop>
-          <div class="flex items-center justify-between px-4 py-3 border-b" style="border-color:#F1F5F9;">
-            <p class="text-sm font-bold" style="color:#0F172A;">Notifications</p>
-            <button v-if="unreadCount > 0" @click="markAllAsRead" class="text-xs font-semibold" style="color:#6366F1;">Mark all read</button>
-          </div>
-          <div v-if="loadingNotifications" class="p-6 text-center"><i class="pi pi-spinner pi-spin" style="color:#6366F1;"></i></div>
-          <div v-else-if="notifications.length === 0" class="p-6 text-center text-sm" style="color:#94A3B8;">No notifications yet</div>
-          <div v-else class="max-h-80 overflow-y-auto">
-            <div
-              v-for="n in notifications" :key="n.id"
-              @click="markAsRead(n)"
-              class="notif-item px-4 py-3 cursor-pointer border-b"
-              :class="{ 'notif-unread': !n.is_read }"
-              style="border-color:#F1F5F9;"
-            >
-              <div class="flex items-start gap-3">
-                <div class="w-2 h-2 mt-1.5 rounded-full flex-shrink-0" :style="{ background: n.is_read ? '#E2E8F0' : '#6366F1' }"></div>
-                <div>
-                  <p class="text-sm font-semibold" style="color:#0F172A;">{{ n.title }}</p>
-                  <p class="text-xs mt-0.5" style="color:#64748B;">{{ n.message }}</p>
-                  <p class="text-xs mt-1" style="color:#CBD5E1;">{{ new Date(n.created_at).toLocaleString() }}</p>
+      <Teleport to="body">
+        <transition name="dropdown">
+          <div v-if="showNotifications" class="dropdown-panel" :style="notifStyle" @click.stop>
+            <div class="flex items-center justify-between px-4 py-3 border-b" style="border-color:#F1F5F9;">
+              <p class="text-sm font-bold" style="color:#0F172A;">Notifications</p>
+              <button v-if="unreadCount > 0" @click="markAllAsRead" class="text-xs font-semibold" style="color:#6366F1;">Mark all read</button>
+            </div>
+            <div v-if="loadingNotifications" class="p-6 text-center"><i class="pi pi-spinner pi-spin" style="color:#6366F1;"></i></div>
+            <div v-else-if="notifications.length === 0" class="p-6 text-center text-sm" style="color:#94A3B8;">No notifications yet</div>
+            <div v-else class="max-h-80 overflow-y-auto">
+              <div
+                v-for="n in notifications" :key="n.id"
+                @click="markAsRead(n)"
+                class="notif-item px-4 py-3 cursor-pointer border-b"
+                :class="{ 'notif-unread': !n.is_read }"
+                style="border-color:#F1F5F9;"
+              >
+                <div class="flex items-start gap-3">
+                  <div class="w-2 h-2 mt-1.5 rounded-full flex-shrink-0" :style="{ background: n.is_read ? '#E2E8F0' : '#6366F1' }"></div>
+                  <div>
+                    <p class="text-sm font-semibold" style="color:#0F172A;">{{ n.title }}</p>
+                    <p class="text-xs mt-0.5" style="color:#64748B;">{{ n.message }}</p>
+                    <p class="text-xs mt-1" style="color:#CBD5E1;">{{ new Date(n.created_at).toLocaleString() }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </transition>
+        </transition>
+      </Teleport>
     </div>
 
     <!-- User Menu -->
     <div class="relative">
-      <button @click="toggleUserMenu" class="user-btn flex items-center gap-2 px-2.5 py-2 rounded-xl">
-        <div class="avatar">{{ user?.name?.charAt(0) || 'U' }}</div>
-        <i class="pi pi-chevron-down text-xs" style="color:#94A3B8;"></i>
+      <button ref="userRef" @click.stop="toggleUserMenu" class="user-btn flex items-center gap-2 px-2.5 py-1.5 rounded-xl">
+        <span class="user-fullname">{{ user?.name || 'User' }}</span>
+        <i class="pi pi-chevron-down text-xs" style="color:rgba(255,255,255,0.5);"></i>
       </button>
-      <transition name="dropdown">
-        <div v-if="showUserMenu" class="dropdown-panel w-44" style="right:0; top:100%;" @click.stop>
-          <button @click="handleLogout" class="w-full px-4 py-3 text-left text-sm font-semibold flex items-center gap-2 hover:bg-red-50 rounded-xl transition-colors" style="color:#EF4444;">
-            <i class="pi pi-sign-out"></i> Logout
-          </button>
-        </div>
-      </transition>
+      <Teleport to="body">
+        <transition name="dropdown">
+          <div v-if="showUserMenu" class="dropdown-panel" :style="userMenuStyle" @click.stop>
+            <button @click="handleLogout" class="w-full px-4 py-3 text-left text-sm font-semibold flex items-center gap-2 hover:bg-red-50 rounded-xl transition-colors" style="color:#EF4444;">
+              <i class="pi pi-sign-out"></i> Logout
+            </button>
+          </div>
+        </transition>
+      </Teleport>
     </div>
 
   </div>
@@ -221,24 +273,24 @@ onMounted(() => {
 }
 
 .icon-btn {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: #F8FAFF;
-  border: 1.5px solid #E2E8F0;
-  color: #64748B;
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.8);
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
 }
 
 .icon-btn:hover {
-  border-color: #6366F1;
-  color: #6366F1;
-  background: #EEF2FF;
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.35);
+  color: #ffffff;
 }
 
 .notif-badge {
@@ -265,28 +317,24 @@ onMounted(() => {
 }
 
 .user-btn {
-  background: #F8FAFF;
-  border: 1.5px solid #E2E8F0;
+  background: transparent;
+  border: none;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .user-btn:hover {
-  border-color: #6366F1;
-  background: #EEF2FF;
+  opacity: 0.85;
 }
 
-.avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #6366F1, #06B6D4);
-  color: white;
+.user-fullname {
+  font-size: 13px;
   font-weight: 700;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: #ffffff;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 
@@ -295,10 +343,11 @@ onMounted(() => {
   background: white;
   border: 1.5px solid #E2E8F0;
   border-radius: 16px;
-  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.15), 0 4px 12px rgba(99,102,241,0.1);
-  z-index: 9999;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22), 0 4px 16px rgba(99,102,241,0.12);
+  z-index: 99999;
   overflow: hidden;
   margin-top: 8px;
+  isolation: isolate;
 }
 
 .notif-item {

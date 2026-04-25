@@ -21,21 +21,11 @@ const navGroups = computed(() => {
       ]
     },
     {
-      label: 'Procurement',
-      items: [
-        { icon: 'pi pi-file', label: 'Tenders', path: '/tenders' },
-        { icon: 'pi pi-users', label: 'Vendors', path: '/vendors' },
-        { icon: 'pi pi-send', label: 'Bids', path: '/bids' },
-      ]
-    },
-    {
       label: 'Workflow',
       items: [
         { icon: 'pi pi-reply', label: 'Responses', path: '/responses' },
-        ...(authStore.isEvaluator ? [
+        ...(authStore.isEvaluator || authStore.isAdmin ? [
           { icon: 'pi pi-list-check', label: 'Questionnaires', path: '/questionnaires' },
-          { icon: 'pi pi-chart-bar', label: 'Evaluations', path: '/evaluations' },
-          { icon: 'pi pi-briefcase', label: 'Contracts', path: '/contracts' },
         ] : [])
       ]
     },

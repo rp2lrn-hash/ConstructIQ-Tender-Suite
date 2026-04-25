@@ -1,4 +1,4 @@
-const { Questionnaire, Question, User, Customer, Tender } = require('../models');
+const { Questionnaire, Question, User, Customer, Tender, Assignment } = require('../models');
 
 // Create a new questionnaire
 exports.createQuestionnaire = async (req, res) => {
@@ -63,7 +63,8 @@ exports.getAllQuestionnaires = async (req, res) => {
         { model: Question, as: 'questions', order: [['order_index', 'ASC']] },
         { model: Customer, as: 'customer', attributes: ['id', 'name'] },
         { model: Tender, as: 'project', attributes: ['id', 'title'] },
-        { model: User, as: 'creator', attributes: ['id', 'name', 'email'] }
+        { model: User, as: 'creator', attributes: ['id', 'name', 'email'] },
+        { model: Assignment, as: 'assignments', attributes: ['id', 'status', 'created_at', 'due_date'], include: [{ model: User, as: 'assignee', attributes: ['id', 'name'] }] }
       ],
       order: [['created_at', 'DESC']]
     });

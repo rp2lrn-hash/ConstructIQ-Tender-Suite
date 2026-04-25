@@ -19,34 +19,27 @@ const animateValue = (target, duration = 1500) => {
 }
 
 const animatedStats = ref({
-  totalTenders: ref(0),
-  activeTenders: ref(0),
-  totalBids: ref(0),
-  totalVendors: ref(0),
-  totalContracts: ref(0),
-  activeContracts: ref(0),
+  totalQuestionnaires: 0,
+  activeQuestionnaires: 0,
+  totalAssignments: 0,
+  pendingAssignments: 0,
+  totalResponses: 0,
+  completedResponses: 0,
 })
 
 const cardsVisible = ref(false)
 
 const authStore = useAuthStore()
 
-const stats = ref({
-  totalSpend: 0,
-  activeBids: 0,
-  daysToAward: 0,
-  totalTenders: 0,
-  activeTenders: 0,
-  totalBids: 0,
-  totalContracts: 0,
-  activeContracts: 0,
-  totalVendors: 0,
-  compliantVendors: 0
-})
-
 const recentTenders = ref([])
 const upcomingDeadlines = ref([])
+const recentResponses = ref([])
+const recentAssignments = ref([])
 const loading = ref(true)
+
+const qStats = ref({ total: 0, active: 0 })
+const aStats = ref({ total: 0, pending: 0, completed: 0 })
+const rStats = ref({ total: 0, completed: 0, inProgress: 0 })
 const aiPanelOpen = ref(false)
 
 const currentDate = computed(() => {
@@ -149,18 +142,45 @@ const pipelineStages = [
 
 const fetchDashboardData = async () => {
   try {
-    const response = await api.get('/reports/dashboard')
-    stats.value = response.data.stats
-    recentTenders.value = response.data.recentTenders
-    upcomingDeadlines.value = response.data.upcomingDeadlines
+    const [qRes, aRes, rRes] = await Promise.allSettled([
+      api.get('/questionnaires'),
+      api.get(authStore.isAdmin.value || authStore.isEvaluator.value ? '/assignments/created' : '/assignments/my'),
+      // Note: isAdmin/isEvaluator are computed refs in Pinia
+      api.get('/responses')
+    ])
+
+    if (qRes.status === 'fulfilled') {
+      const qs = qRes.value.data || []
+      qStats.value = { total: qs.length, active: qs.filter(q => q.is_active).length }
+    }
+    if (aRes.status === 'fulfilled') {
+      const as = aRes.value.data || []
+      aStats.value = { total: as.length, pending: as.filter(a => a.status === 'pending').length, completed: as.filter(a => a.status === 'completed').length }
+      recentAssignments.value = as.slice(0, 5)
+    }
+    if (rRes.status === 'fulfilled') {
+      const rs = rRes.value.data || []
+      rStats.value = { total: rs.length, completed: rs.filter(r => r.status === 'completed').length, inProgress: rs.filter(r => r.status === 'in_progress').length }
+      recentResponses.value = rs.slice(0, 5)
+    }
+
+    const animate = (key, target) => {
+      const start = performance.now()
+      const tick = (now) => {
+        const p = Math.min((now - start) / 1200, 1)
+        animatedStats.value[key] = Math.round(target * (1 - Math.pow(1 - p, 3)))
+        if (p < 1) requestAnimationFrame(tick)
+      }
+      requestAnimationFrame(tick)
+    }
     setTimeout(() => {
       cardsVisible.value = true
-      animatedStats.value.totalTenders = animateValue(stats.value.totalTenders || 0)
-      animatedStats.value.activeTenders = animateValue(stats.value.activeTenders || 0)
-      animatedStats.value.totalBids = animateValue(stats.value.totalBids || 0)
-      animatedStats.value.totalVendors = animateValue(stats.value.totalVendors || 0)
-      animatedStats.value.totalContracts = animateValue(stats.value.totalContracts || 0)
-      animatedStats.value.activeContracts = animateValue(stats.value.activeContracts || 0)
+      animate('totalQuestionnaires', qStats.value.total)
+      animate('activeQuestionnaires', qStats.value.active)
+      animate('totalAssignments', aStats.value.total)
+      animate('pendingAssignments', aStats.value.pending)
+      animate('totalResponses', rStats.value.total)
+      animate('completedResponses', rStats.value.completed)
     }, 100)
   } catch (error) {
     console.error('Failed to fetch dashboard data:', error)
@@ -170,12 +190,12 @@ const fetchDashboardData = async () => {
 }
 
 const statCards = computed(() => [
-  { label: 'Total Tenders', value: animatedStats.value.totalTenders, sub: 'All time', icon: 'pi pi-file', bg: 'linear-gradient(135deg, #6366F1 0%, #4338CA 100%)' },
-  { label: 'Active Tenders', value: animatedStats.value.activeTenders, sub: 'Currently open', icon: 'pi pi-bolt', bg: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)' },
-  { label: 'Total Bids', value: animatedStats.value.totalBids, sub: 'Submitted bids', icon: 'pi pi-send', bg: 'linear-gradient(135deg, #EC4899 0%, #A855F7 100%)' },
-  { label: 'Total Vendors', value: animatedStats.value.totalVendors, sub: 'Registered vendors', icon: 'pi pi-users', bg: 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)' },
-  { label: 'Contracts', value: animatedStats.value.totalContracts, sub: 'All contracts', icon: 'pi pi-briefcase', bg: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)' },
-  { label: 'Active Contracts', value: animatedStats.value.activeContracts, sub: 'In progress', icon: 'pi pi-check-circle', bg: 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)' },
+  { label: 'Questionnaires', value: animatedStats.value.totalQuestionnaires, sub: `${qStats.value.active} active`, icon: 'pi pi-list-check', bg: 'linear-gradient(135deg, #6366F1 0%, #4338CA 100%)' },
+  { label: 'Active Questionnaires', value: animatedStats.value.activeQuestionnaires, sub: 'Currently active', icon: 'pi pi-bolt', bg: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)' },
+  { label: 'Total Assignments', value: animatedStats.value.totalAssignments, sub: `${aStats.value.pending} pending`, icon: 'pi pi-users', bg: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)' },
+  { label: 'Pending Assignments', value: animatedStats.value.pendingAssignments, sub: 'Awaiting response', icon: 'pi pi-clock', bg: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' },
+  { label: 'Total Responses', value: animatedStats.value.totalResponses, sub: `${rStats.value.inProgress} in progress`, icon: 'pi pi-reply', bg: 'linear-gradient(135deg, #EC4899 0%, #A855F7 100%)' },
+  { label: 'Completed Responses', value: animatedStats.value.completedResponses, sub: 'Fully submitted', icon: 'pi pi-check-circle', bg: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' },
 ])
 
 onMounted(() => {
@@ -201,16 +221,16 @@ onMounted(() => {
         <div class="wb-left">
           <p class="wb-eyebrow">{{ currentDate }}</p>
           <h1 class="wb-heading">{{ greeting }}, {{ authStore.user?.name?.split(' ')[0] || 'User' }} 👋</h1>
-          <p class="wb-sub">Here's your procurement snapshot for today.</p>
+          <p class="wb-sub">Here's your questionnaire workflow snapshot for today.</p>
           <div class="wb-tags">
             <span class="wb-tag" style="background:rgba(99,102,241,0.18);color:#6366F1;">
-              <i class="pi pi-file mr-1" style="font-size:10px;"></i>Tenders
+              <i class="pi pi-list-check mr-1" style="font-size:10px;"></i>Questionnaires
             </span>
-            <span class="wb-tag" style="background:rgba(6,182,212,0.18);color:#0EA5E9;">
-              <i class="pi pi-send mr-1" style="font-size:10px;"></i>Bids
+            <span class="wb-tag" style="background:rgba(139,92,246,0.18);color:#8B5CF6;">
+              <i class="pi pi-users mr-1" style="font-size:10px;"></i>Assignments
             </span>
             <span class="wb-tag" style="background:rgba(16,185,129,0.18);color:#10B981;">
-              <i class="pi pi-briefcase mr-1" style="font-size:10px;"></i>Contracts
+              <i class="pi pi-reply mr-1" style="font-size:10px;"></i>Responses
             </span>
           </div>
         </div>
@@ -226,9 +246,9 @@ onMounted(() => {
             </div>
           </div>
           <div class="wb-legend">
-            <div class="wb-legend-item"><span class="wb-dot" style="background:#6366F1;"></span>Draft</div>
-            <div class="wb-legend-item"><span class="wb-dot" style="background:#0EA5E9;"></span>Active</div>
-            <div class="wb-legend-item"><span class="wb-dot" style="background:#10B981;"></span>Awarded</div>
+            <div class="wb-legend-item"><span class="wb-dot" style="background:#6366F1;"></span>Questions</div>
+            <div class="wb-legend-item"><span class="wb-dot" style="background:#8B5CF6;"></span>Assigned</div>
+            <div class="wb-legend-item"><span class="wb-dot" style="background:#10B981;"></span>Completed</div>
           </div>
         </div>
       </div>
@@ -255,7 +275,7 @@ onMounted(() => {
               <i :class="card.icon" class="text-white"></i>
             </div>
           </div>
-          <div class="sc-value">{{ card.value?.value ?? 0 }}</div>
+          <div class="sc-value">{{ card.value ?? 0 }}</div>
           <div class="sc-sub">
             <i class="pi pi-arrow-up-right" style="font-size:9px;"></i>
             {{ card.sub }}
@@ -264,6 +284,62 @@ onMounted(() => {
       </div>
     </div>
 
+    <!-- Recent Activity Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+      <!-- Recent Responses -->
+      <div class="activity-card">
+        <div class="activity-header">
+          <div class="flex items-center gap-2">
+            <div class="activity-icon" style="background:linear-gradient(135deg,#10B981,#059669);"><i class="pi pi-reply text-white" style="font-size:13px;"></i></div>
+            <div>
+              <p class="activity-title">Recent Responses</p>
+              <p class="activity-sub">{{ rStats.total }} total · {{ rStats.completed }} completed</p>
+            </div>
+          </div>
+        </div>
+        <div v-if="recentResponses.length === 0" class="activity-empty">No responses yet</div>
+        <div v-else class="activity-list">
+          <div v-for="r in recentResponses" :key="r.id" class="activity-item">
+            <div class="activity-dot" :style="{ background: r.status==='completed' ? '#10B981' : r.status==='in_progress' ? '#3B82F6' : '#94A3B8' }"></div>
+            <div class="flex-1 min-w-0">
+              <p class="activity-name">{{ (r.questionnaire||r.Questionnaire)?.title || 'Questionnaire' }}</p>
+              <p class="activity-meta">{{ r.submitter?.name || 'Unknown' }} · {{ new Date(r.last_updated).toLocaleDateString() }}</p>
+            </div>
+            <span class="activity-badge" :style="{ background: r.status==='completed' ? 'rgba(16,185,129,0.12)' : 'rgba(59,130,246,0.12)', color: r.status==='completed' ? '#10B981' : '#3B82F6' }">
+              {{ r.status === 'completed' ? 'Completed' : r.status === 'in_progress' ? 'In Progress' : r.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Assignments -->
+      <div class="activity-card">
+        <div class="activity-header">
+          <div class="flex items-center gap-2">
+            <div class="activity-icon" style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);"><i class="pi pi-users text-white" style="font-size:13px;"></i></div>
+            <div>
+              <p class="activity-title">Recent Assignments</p>
+              <p class="activity-sub">{{ aStats.total }} total · {{ aStats.pending }} pending</p>
+            </div>
+          </div>
+        </div>
+        <div v-if="recentAssignments.length === 0" class="activity-empty">No assignments yet</div>
+        <div v-else class="activity-list">
+          <div v-for="a in recentAssignments" :key="a.id" class="activity-item">
+            <div class="activity-dot" :style="{ background: a.status==='completed' ? '#10B981' : a.status==='pending' ? '#F59E0B' : '#3B82F6' }"></div>
+            <div class="flex-1 min-w-0">
+              <p class="activity-name">{{ a.questionnaire?.title || 'Questionnaire' }}</p>
+              <p class="activity-meta">Assigned to {{ a.assignee?.name || 'Unknown' }} · {{ a.due_date ? new Date(a.due_date).toLocaleDateString() : 'No due date' }}</p>
+            </div>
+            <span class="activity-badge" :style="{ background: a.status==='completed' ? 'rgba(16,185,129,0.12)' : a.status==='pending' ? 'rgba(245,158,11,0.12)' : 'rgba(59,130,246,0.12)', color: a.status==='completed' ? '#10B981' : a.status==='pending' ? '#F59E0B' : '#3B82F6' }">
+              {{ a.status.charAt(0).toUpperCase() + a.status.slice(1) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
   </div>
 </template>
@@ -504,4 +580,51 @@ onMounted(() => {
   50% { transform: scale(1.1); }
 }
 .icon-animate { animation: iconPulse 2s ease-in-out infinite; }
+
+/* Activity cards */
+.activity-card {
+  background: white;
+  border-radius: 20px;
+  border: 1.5px solid #F1F5F9;
+  box-shadow: 0 4px 24px rgba(15,23,42,0.06);
+  overflow: hidden;
+}
+.activity-header {
+  padding: 18px 20px 14px;
+  border-bottom: 1.5px solid #F8FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.activity-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.activity-title { font-size: 14px; font-weight: 800; color: #0F172A; }
+.activity-sub { font-size: 11px; color: #94A3B8; font-weight: 600; margin-top: 1px; }
+.activity-empty { padding: 32px; text-align: center; font-size: 13px; color: #94A3B8; }
+.activity-list { padding: 8px 0; }
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #F8FAFC;
+  transition: background 0.15s;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-item:hover { background: #F8FAFF; }
+.activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.activity-name { font-size: 13px; font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.activity-meta { font-size: 11px; color: #94A3B8; font-weight: 500; margin-top: 2px; }
+.activity-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 </style>

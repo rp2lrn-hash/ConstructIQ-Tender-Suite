@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeUnmount } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Sidebar from '@/components/Sidebar.vue'
@@ -57,16 +57,19 @@ const pageTitle = () => {
 const pageIcon = () => {
   const p = route.path
   if (p === '/') return 'pi pi-th-large'
-  if (p.startsWith('/tenders')) return 'pi pi-file'
-  if (p.startsWith('/vendors')) return 'pi pi-users'
-  if (p.startsWith('/bids')) return 'pi pi-send'
   if (p.startsWith('/responses')) return 'pi pi-reply'
   if (p.startsWith('/questionnaires')) return 'pi pi-list-check'
-  if (p.startsWith('/evaluations')) return 'pi pi-chart-bar'
-  if (p.startsWith('/contracts')) return 'pi pi-briefcase'
   if (p.startsWith('/admin')) return 'pi pi-shield'
   return 'pi pi-home'
 }
+
+const contextualAction = computed(() => {
+  const p = route.path
+  if (p === '/questionnaires') return { label: 'New Questionnaire', icon: 'pi pi-plus', route: '/questionnaires' }
+  if (p === '/responses') return { label: 'View Responses', icon: 'pi pi-list', route: '/responses' }
+  return null
+})
+
 </script>
 
 <template>
@@ -89,6 +92,7 @@ const pageIcon = () => {
             <i class="pi pi-bars text-sm"></i>
           </button>
           <div class="header-icon-wrap">
+            <div class="header-icon-accent"></div>
             <i :class="pageIcon()" class="text-white text-sm"></i>
           </div>
           <div>
@@ -97,11 +101,9 @@ const pageIcon = () => {
           </div>
         </div>
 
-        <!-- Right: quick actions + frosted pill -->
+        <!-- Right: contextual action + frosted pill -->
         <div class="flex items-center gap-3">
-          <button class="quick-actions-btn">
-            <i class="pi pi-plus text-xs mr-1.5"></i> Quick Actions
-          </button>
+          <!-- Navbar pill: bell + full name -->
           <div class="navbar-pill">
             <Navbar :user="authStore.user" @logout="handleLogout" />
           </div>
@@ -214,70 +216,109 @@ const pageIcon = () => {
 /* Top header */
 .top-header {
   height: 68px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(238,240,255,0.95) 100%);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(99,102,241,0.12);
+  background: linear-gradient(135deg, #1E1B4B 0%, #312E81 55%, #1E3A5F 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
   flex-shrink: 0;
-  box-shadow: 0 2px 16px rgba(99,102,241,0.08);
+  box-shadow: 0 4px 24px rgba(15,23,42,0.22);
   overflow: visible;
   position: relative;
   z-index: 100;
 }
+.top-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #6366F1 0%, #8B5CF6 50%, #06B6D4 100%);
+}
 
 .header-icon-wrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+  position: relative;
+  overflow: hidden;
+}
+.header-icon-accent {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #06B6D4, #6366F1);
+  border-radius: 3px 0 0 3px;
 }
 
 .page-title-gradient {
-  font-size: 18px;
-  font-weight: 900;
-  background: linear-gradient(135deg, #4F46E5, #7C3AED, #0EA5E9);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffffff;
   line-height: 1.2;
+  letter-spacing: 0.2px;
 }
 
 .quick-actions-btn {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #6366F1, #06B6D4);
   color: white;
   font-size: 12px;
   font-weight: 700;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+  box-shadow: 0 4px 16px rgba(99,102,241,0.45);
   transition: all 0.2s ease;
   white-space: nowrap;
+  letter-spacing: 0.3px;
 }
 .quick-actions-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(99,102,241,0.4);
+  box-shadow: 0 6px 22px rgba(99,102,241,0.55);
+  filter: brightness(1.08);
 }
 
 .navbar-pill {
-  background: rgba(255,255,255,0.8);
-  border: 1.5px solid rgba(99,102,241,0.15);
+  background: rgba(255,255,255,0.1);
+  border: 1.5px solid rgba(255,255,255,0.18);
   border-radius: 14px;
-  padding: 4px 8px;
+  padding: 5px 10px 5px 10px;
   backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 200;
+  overflow: visible;
+}
+.user-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1;
+}
+.user-identity-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.user-identity-role {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  text-transform: capitalize;
+  margin-top: 2px;
 }
 
 .page-title {
@@ -289,7 +330,7 @@ const pageIcon = () => {
 
 .page-breadcrumb {
   font-size: 11px;
-  color: #94A3B8;
+  color: rgba(255,255,255,0.45);
   font-weight: 500;
 }
 
@@ -297,16 +338,16 @@ const pageIcon = () => {
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  border: 1.5px solid #E2E8F0;
-  background: #F8FAFF;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #64748B;
+  color: rgba(255,255,255,0.7);
   transition: all 0.2s;
 }
-.expand-btn:hover { border-color: #6366F1; color: #6366F1; background: #EEF2FF; }
+.expand-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.18); }
 
 /* Main content area */
 .app-main {

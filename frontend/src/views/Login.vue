@@ -19,14 +19,14 @@ const loading = ref(false)
 const error = ref('')
 
 const features = [
-  { icon: 'pi pi-briefcase', title: 'Manage Tenders', desc: 'Create & publish tender opportunities', gradient: 'linear-gradient(135deg,#6366F1,#8B5CF6)' },
-  { icon: 'pi pi-users', title: 'Vendor Management', desc: 'Track submissions & compliance', gradient: 'linear-gradient(135deg,#06B6D4,#0EA5E9)' },
-  { icon: 'pi pi-chart-bar', title: 'Analytics & Reports', desc: 'Real-time dashboards & insights', gradient: 'linear-gradient(135deg,#10B981,#06B6D4)' },
+  { icon: 'pi pi-list-check', title: 'Questionnaire Builder', desc: 'Create & manage structured questionnaire templates', gradient: 'linear-gradient(135deg,#6366F1,#8B5CF6)' },
+  { icon: 'pi pi-send', title: 'Smart Assignments', desc: 'Assign questionnaires to teams with deadlines', gradient: 'linear-gradient(135deg,#06B6D4,#0EA5E9)' },
+  { icon: 'pi pi-reply', title: 'Response Tracking', desc: 'Monitor submissions, progress & review responses', gradient: 'linear-gradient(135deg,#10B981,#06B6D4)' },
 ]
 const stats = [
-  { value: '500+', label: 'Tenders Managed' },
-  { value: '98%', label: 'Client Satisfaction' },
-  { value: '3x', label: 'Faster Procurement' },
+  { value: '100%', label: 'Digital Workflow' },
+  { value: 'Real-time', label: 'Progress Tracking' },
+  { value: 'Role-based', label: 'Access Control' },
 ]
 
 const handleLogin = async () => {
@@ -64,8 +64,8 @@ const handleLogin = async () => {
       <!-- Hero Text & Feature Cards -->
       <div class="relative z-10 space-y-8">
         <div>
-          <h2 class="text-4xl font-black leading-tight" style="color: #fff;">Manage Tenders<br/><span class="hero-gradient-text">Smarter & Faster</span></h2>
-          <p class="mt-3 text-sm leading-relaxed" style="color: rgba(255,255,255,0.55);">The all-in-one platform for construction procurement, vendor management, and contract oversight.</p>
+          <h2 class="text-4xl font-black leading-tight" style="color: #fff;">Streamline Your<br/><span class="hero-gradient-text">Tender Responses</span></h2>
+          <p class="mt-3 text-sm leading-relaxed" style="color: rgba(255,255,255,0.55);">The all-in-one platform to build questionnaires, assign them to your team, and track responses in real time.</p>
         </div>
 
         <div class="space-y-3">
@@ -90,7 +90,7 @@ const handleLogin = async () => {
       </div>
 
       <!-- Footer -->
-      <p class="relative z-10 text-xs" style="color: rgba(255,255,255,0.3);">© 2024 ConstructIQ. All rights reserved.</p>
+      <p class="relative z-10 text-xs" style="color: rgba(255,255,255,0.3);"> 2025 ConstructIQ. All rights reserved.</p>
     </div>
 
     <!-- RIGHT PANEL — Login Form -->
@@ -109,8 +109,7 @@ const handleLogin = async () => {
         <!-- Form Card -->
         <div class="form-card p-8 rounded-3xl">
           <div class="mb-7">
-            <h1 class="text-2xl font-black" style="color:#0F172A;">Welcome back 👋</h1>
-            <p class="text-sm mt-1" style="color:#64748B;">Sign in to your ConstructIQ account</p>
+            <h1 class="login-signin-title">Sign In</h1>
           </div>
 
           <form @submit.prevent="handleLogin" class="space-y-5">
@@ -222,6 +221,18 @@ const handleLogin = async () => {
 @keyframes feature-slide {
   from { opacity: 0; transform: translateX(-20px); }
   to   { opacity: 1; transform: translateX(0); }
+}
+
+.login-signin-title {
+  font-size: 32px;
+  font-weight: 900;
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(135deg, #6366F1, #8B5CF6, #06B6D4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
 }
 
 /* RIGHT PANEL */

@@ -149,7 +149,7 @@ onMounted(() => {
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <div>
             <p class="text-xs font-bold mb-1" style="color: #666;">Questionnaire</p>
-            <p class="text-sm font-bold" style="color: #212121;">{{ response.Questionnaire?.title || 'N/A' }}</p>
+            <p class="text-sm font-bold" style="color: #212121;">{{ (response.questionnaire || response.Questionnaire)?.title || 'N/A' }}</p>
           </div>
           <div>
             <p class="text-xs font-bold mb-1" style="color: #666;">Project</p>
@@ -193,29 +193,29 @@ onMounted(() => {
       <div class="p-6 rounded-2xl pulse-glow transition-all duration-300 hover:shadow-xl hover:scale-105" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);">
         <h3 class="text-lg font-bold mb-6" style="color: #212121;">Questions & Answers</h3>
         
-        <div v-if="!response.AnswerDetails || response.AnswerDetails.length === 0" class="text-center py-8" style="color: #666;">
+        <div v-if="!(response.answer_details || response.AnswerDetails)?.length" class="text-center py-8" style="color: #666;">
           <p>No answers provided yet</p>
         </div>
 
         <div v-else class="space-y-6">
           <div
-            v-for="answer in response.AnswerDetails"
+            v-for="(answer, idx) in (response.answer_details || response.AnswerDetails)"
             :key="answer.id"
             class="pb-6"
-            :style="{ borderBottom: answer.id !== response.AnswerDetails[response.AnswerDetails.length - 1].id ? '1.5px solid #E0F2F7' : 'none' }"
+            :style="{ borderBottom: idx < (response.answer_details || response.AnswerDetails).length - 1 ? '1.5px solid #E0F2F7' : 'none' }"
           >
             <p class="text-sm font-bold mb-2" style="color: #212121;">
-              {{ answer.Question?.question_text || 'Unknown Question' }}
-              <span v-if="answer.Question?.is_required" style="color: #DC2626;">*</span>
+              {{ (answer.question || answer.Question)?.question_text || 'Unknown Question' }}
+              <span v-if="(answer.question || answer.Question)?.is_required" style="color: #DC2626;">*</span>
             </p>
             
             <!-- Text/Textarea/Number/Date answers -->
-            <p v-if="['text', 'textarea', 'number', 'date'].includes(answer.Question?.question_type)" class="text-sm p-3 rounded-xl" style="color: #666; background: rgba(46, 100, 254, 0.05);">
+            <p v-if="['text', 'textarea', 'number', 'date'].includes((answer.question || answer.Question)?.question_type)" class="text-sm p-3 rounded-xl" style="color: #666; background: rgba(46, 100, 254, 0.05);">
               {{ answer.answer_text || 'No answer provided' }}
             </p>
 
             <!-- Radio/Checkbox/Dropdown answers -->
-            <div v-else-if="['radio', 'checkbox', 'dropdown'].includes(answer.Question?.question_type)" class="space-y-2">
+            <div v-else-if="['radio', 'checkbox', 'dropdown'].includes((answer.question || answer.Question)?.question_type)" class="space-y-2">
               <div v-if="answer.answer_value && Array.isArray(answer.answer_value)">
                 <div v-for="(val, index) in answer.answer_value" :key="index" class="flex items-center space-x-2 p-2 rounded-lg" style="background: rgba(46, 100, 254, 0.05);">
                   <i class="pi pi-check text-xs" style="color: #10B981;"></i>
@@ -228,7 +228,7 @@ onMounted(() => {
             </div>
 
             <!-- File upload answer -->
-            <div v-else-if="answer.Question?.question_type === 'file_upload'" class="p-4 rounded-xl" style="background: rgba(46, 100, 254, 0.05);">
+            <div v-else-if="(answer.question || answer.Question)?.question_type === 'file_upload'" class="p-4 rounded-xl" style="background: rgba(46, 100, 254, 0.05);">
               <div v-if="answer.file_path" class="flex items-center space-x-2">
                 <i class="pi pi-file text-2xl" style="color: #2E64FE;"></i>
                 <a :href="answer.file_path" target="_blank" class="text-sm font-bold hover:underline" style="color: #2E64FE;">
