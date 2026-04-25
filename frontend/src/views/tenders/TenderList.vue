@@ -61,7 +61,7 @@ onMounted(() => {
       <div class="flex items-center space-x-3">
         <button
           @click="showClosed = !showClosed"
-          class="px-4 py-2 text-sm font-bold transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
+          class="px-4 py-2 text-sm font-bold hover-scale rounded-xl"
           style="background: white; border: 2px solid #E0F2F7; color: #212121;"
         >
           {{ showClosed ? 'Hide Closed' : 'Show Closed' }}
@@ -69,7 +69,7 @@ onMounted(() => {
         <button
           v-if="authStore.isEvaluator"
           @click="handleCreate"
-          class="px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
+          class="px-4 py-2 text-sm font-bold text-white hover-glow hover-scale rounded-xl animate-pulse-ring"
           style="background: linear-gradient(135deg, #2E64FE 0%, #00B4D8 100%);"
         >
           + New Tender
@@ -83,10 +83,16 @@ onMounted(() => {
 
     <div v-else class="space-y-5">
       <div
-        v-for="tender in tenders"
+        v-for="(tender, index) in tenders"
         :key="tender.id"
-        class="p-6 rounded-2xl pulse-glow transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer relative overflow-hidden"
-        style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);"
+        class="p-6 rounded-2xl hover-lift cursor-pointer relative overflow-hidden animate-slide-in-bottom"
+        :style="{ 
+          background: 'rgba(255, 255, 255, 0.9)', 
+          backdropFilter: 'blur(10px)', 
+          border: '2px solid rgba(46, 100, 254, 0.3)', 
+          boxShadow: '0 0 30px rgba(46, 100, 254, 0.2)',
+          animationDelay: `${index * 0.1}s`
+        }"
         @click="handleView(tender.id)"
       >
         <div class="absolute left-0 top-0 bottom-0 w-1" :style="{ background: getUrgencyGradient(tender.status) }"></div>

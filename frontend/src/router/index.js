@@ -6,7 +6,7 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import('@/views/Login.vue'),
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false, transition: 'zoom' }
   },
   {
     path: '/',
@@ -16,7 +16,8 @@ const routes = [
       {
         path: '',
         name: 'Dashboard',
-        component: () => import('@/views/Dashboard.vue')
+        component: () => import('@/views/Dashboard.vue'),
+        meta: { transition: 'slide-fade' }
       },
       // Admin Routes
       {
