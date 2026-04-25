@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
@@ -99,250 +99,221 @@ const getGreeting = () => {
   return 'Good Evening'
 }
 
+const navItems = [
+  { path: '/', label: 'Dashboard', icon: 'pi pi-home' },
+  { path: '/tenders', label: 'Tenders', icon: 'pi pi-file' },
+  { path: '/questionnaires', label: 'Questionnaires', icon: 'pi pi-list', roleRequired: true },
+  { path: '/responses', label: 'Responses', icon: 'pi pi-reply' },
+]
+
+const isActive = (path) => {
+  if (path === '/') return router.currentRoute.value.path === '/'
+  return router.currentRoute.value.path.startsWith(path)
+}
+
+const handleLogout = async () => {
+  showUserMenu.value = false
+  authStore.logout()
+  await router.push('/login')
+}
+
 onMounted(() => {
   fetchUnreadCount()
-  // Poll for new notifications every 30 seconds
-  setInterval(fetchUnreadCount, 30000)
+  setInterval(fetchUnreadCount, 60000)
 })
 </script>
 
 <template>
-  <header class="px-8 py-4 flex items-center sticky top-0 z-20 relative" style="background: #E0F2F7;">
-    <div class="flex items-center justify-between w-full">
-      <!-- Logo -->
-      <div class="flex items-center space-x-6">
-        <h1 class="text-3xl font-extrabold header-gradient-alt" style="font-family: 'Poppins', sans-serif; letter-spacing: 2px; text-shadow: 0 0 20px rgba(168, 85, 247, 0.3);">Construct<span style="font-weight: 900;">IQ</span></h1>
-      </div>
+  <div class="flex items-center gap-3">
 
-      <!-- Navigation Menu -->
-      <nav class="hidden md:flex items-center space-x-6">
-        <button
-          @click="navigateTo('/')"
-          class="px-4 py-2 text-sm font-bold transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
-          :style="{
-            background: router.currentRoute.value.path === '/' ? 'rgba(46, 100, 254, 0.1)' : 'white',
-            color: router.currentRoute.value.path === '/' ? '#2E64FE' : '#212121',
-            border: router.currentRoute.value.path === '/' ? '2px solid #2E64FE' : '2px solid #E0F2F7'
-          }"
-        >
-          Dashboard
-        </button>
-        <button
-          @click="navigateTo('/tenders')"
-          class="px-4 py-2 text-sm font-bold transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
-          :style="{
-            background: router.currentRoute.value.path.startsWith('/tenders') ? 'rgba(46, 100, 254, 0.1)' : 'white',
-            color: router.currentRoute.value.path.startsWith('/tenders') ? '#2E64FE' : '#212121',
-            border: router.currentRoute.value.path.startsWith('/tenders') ? '2px solid #2E64FE' : '2px solid #E0F2F7'
-          }"
-        >
-          Tenders
-        </button>
-        <button
-          v-if="authStore.isEvaluator"
-          @click="navigateTo('/questionnaires')"
-          class="px-4 py-2 text-sm font-bold transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
-          :style="{
-            background: router.currentRoute.value.path.startsWith('/questionnaires') ? 'rgba(46, 100, 254, 0.1)' : 'white',
-            color: router.currentRoute.value.path.startsWith('/questionnaires') ? '#2E64FE' : '#212121',
-            border: router.currentRoute.value.path.startsWith('/questionnaires') ? '2px solid #2E64FE' : '2px solid #E0F2F7'
-          }"
-        >
-          Questionnaires
-        </button>
-        <button
-          @click="navigateTo('/responses')"
-          class="px-4 py-2 text-sm font-bold transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
-          :style="{
-            background: router.currentRoute.value.path.startsWith('/responses') ? 'rgba(46, 100, 254, 0.1)' : 'white',
-            color: router.currentRoute.value.path.startsWith('/responses') ? '#2E64FE' : '#212121',
-            border: router.currentRoute.value.path.startsWith('/responses') ? '2px solid #2E64FE' : '2px solid #E0F2F7'
-          }"
-        >
-          Responses
-        </button>
-      </nav>
-
-      <!-- Right Side Actions -->
-      <div class="flex items-center space-x-4">
-        <!-- Mobile Menu Toggle -->
-        <button
-          @click="toggleNavMenu"
-          class="md:hidden w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 hover:shadow-lg hover:scale-110"
-          style="background: white; border: 2px solid #E0F2F7;"
-        >
-          <i class="pi pi-bars" style="color: #2E64FE;"></i>
-        </button>
-
-        <!-- Notifications -->
-        <div class="relative">
-          <button
-            @click="toggleNotifications"
-            class="w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 hover:shadow-lg hover:scale-110"
-            style="background: white; border: 2px solid #E0F2F7;"
-          >
-            <i class="pi pi-bell" style="color: #2E64FE;"></i>
-            <span v-if="unreadCount > 0" class="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white" style="background: #DC2626;">
-              {{ unreadCount > 9 ? '9+' : unreadCount }}
-            </span>
-          </button>
-
-          <div
-            v-if="showNotifications"
-            class="absolute right-0 mt-2 w-80 z-50 rounded-2xl pulse-glow transition-all duration-300 hover:shadow-xl"
-            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);"
-            @click.stop
-          >
-            <div class="px-4 py-3 border-b flex items-center justify-between" style="border-color: #E0F2F7;">
-              <p class="text-sm font-bold" style="color: #212121;">Notifications</p>
-              <button
-                v-if="unreadCount > 0"
-                @click="markAllAsRead"
-                class="text-xs font-bold transition-colors"
-                style="color: #2E64FE;"
-              >
-                Mark all read
-              </button>
-            </div>
-            
-            <div v-if="loadingNotifications" class="p-4 text-center">
-              <i class="pi pi-spinner pi-spin" style="color: #666;"></i>
-            </div>
-            
-            <div v-else-if="notifications.length === 0" class="p-4 text-center text-sm" style="color: #666;">
-              <p>No notifications</p>
-            </div>
-            
-            <div v-else class="max-h-96 overflow-y-auto">
-              <div
-                v-for="notification in notifications"
-                :key="notification.id"
-                @click="markAsRead(notification)"
-                class="px-4 py-3 border-b cursor-pointer transition-colors hover:bg-blue-50"
-                :class="{ 'bg-blue-50': !notification.is_read }"
-                style="border-color: #E0F2F7;"
-              >
-                <div class="flex items-start space-x-3">
-                  <div class="w-2 h-2 mt-2 rounded-full flex-shrink-0" :style="{ background: notification.is_read ? '#E0F2F7' : '#2E64FE' }"></div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold mb-1" style="color: #212121;">{{ notification.title }}</p>
-                    <p class="text-xs mb-1" style="color: #666;">{{ notification.message }}</p>
-                    <p class="text-xs" style="color: #999;">{{ new Date(notification.created_at).toLocaleString() }}</p>
-                  </div>
+    <!-- Notifications -->
+    <div class="relative">
+      <button @click="toggleNotifications" class="icon-btn relative">
+        <i class="pi pi-bell"></i>
+        <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+      </button>
+      <transition name="dropdown">
+        <div v-if="showNotifications" class="dropdown-panel w-80" style="right:0; top:100%;" @click.stop>
+          <div class="flex items-center justify-between px-4 py-3 border-b" style="border-color:#F1F5F9;">
+            <p class="text-sm font-bold" style="color:#0F172A;">Notifications</p>
+            <button v-if="unreadCount > 0" @click="markAllAsRead" class="text-xs font-semibold" style="color:#6366F1;">Mark all read</button>
+          </div>
+          <div v-if="loadingNotifications" class="p-6 text-center"><i class="pi pi-spinner pi-spin" style="color:#6366F1;"></i></div>
+          <div v-else-if="notifications.length === 0" class="p-6 text-center text-sm" style="color:#94A3B8;">No notifications yet</div>
+          <div v-else class="max-h-80 overflow-y-auto">
+            <div
+              v-for="n in notifications" :key="n.id"
+              @click="markAsRead(n)"
+              class="notif-item px-4 py-3 cursor-pointer border-b"
+              :class="{ 'notif-unread': !n.is_read }"
+              style="border-color:#F1F5F9;"
+            >
+              <div class="flex items-start gap-3">
+                <div class="w-2 h-2 mt-1.5 rounded-full flex-shrink-0" :style="{ background: n.is_read ? '#E2E8F0' : '#6366F1' }"></div>
+                <div>
+                  <p class="text-sm font-semibold" style="color:#0F172A;">{{ n.title }}</p>
+                  <p class="text-xs mt-0.5" style="color:#64748B;">{{ n.message }}</p>
+                  <p class="text-xs mt-1" style="color:#CBD5E1;">{{ new Date(n.created_at).toLocaleString() }}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </transition>
+    </div>
 
-        <!-- User Menu -->
-        <div class="relative">
-          <button
-            @click="toggleUserMenu"
-            class="flex items-center space-x-3 p-2 transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-2xl"
-            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);"
-          >
-            <div class="w-10 h-10 flex items-center justify-center text-white font-semibold rounded-full" style="background: linear-gradient(135deg, #2E64FE 0%, #00B4D8 100%);">
-              {{ user?.name?.charAt(0) || 'U' }}
-            </div>
-            <div v-if="user" class="hidden md:block text-left">
-              <p class="text-sm font-bold" style="color: #212121;">{{ user.name }}</p>
-              <p class="text-xs capitalize" style="color: #666;">{{ user.role?.replace('_', ' ') }}</p>
-            </div>
-            <i class="pi pi-chevron-down" style="color: #666;"></i>
+    <!-- User Menu -->
+    <div class="relative">
+      <button @click="toggleUserMenu" class="user-btn flex items-center gap-2 px-2.5 py-2 rounded-xl">
+        <div class="avatar">{{ user?.name?.charAt(0) || 'U' }}</div>
+        <i class="pi pi-chevron-down text-xs" style="color:#94A3B8;"></i>
+      </button>
+      <transition name="dropdown">
+        <div v-if="showUserMenu" class="dropdown-panel w-44" style="right:0; top:100%;" @click.stop>
+          <button @click="handleLogout" class="w-full px-4 py-3 text-left text-sm font-semibold flex items-center gap-2 hover:bg-red-50 rounded-xl transition-colors" style="color:#EF4444;">
+            <i class="pi pi-sign-out"></i> Logout
           </button>
-
-          <div
-            v-if="showUserMenu"
-            class="absolute right-0 mt-2 w-48 py-2 z-50 p-4 rounded-2xl pulse-glow transition-all duration-300 hover:shadow-xl hover:scale-105"
-            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);"
-            @click.stop
-          >
-            <button
-              @click="emit('logout')"
-              class="w-full px-4 py-2 text-left transition-colors flex items-center hover:bg-sneat-gray-100 rounded-xl"
-              style="color: #212121;"
-            >
-              <i class="pi pi-sign-out mr-2"></i>
-              Logout
-            </button>
-          </div>
         </div>
-      </div>
+      </transition>
     </div>
 
-    <!-- Mobile Navigation Menu -->
-    <div
-      v-if="showNavMenu"
-      class="absolute top-full left-0 right-0 mt-2 p-4 z-50 rounded-2xl pulse-glow transition-all duration-300"
-      style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);"
-      @click.stop
-    >
-      <div class="space-y-2">
-        <button
-          @click="navigateTo('/')"
-          class="w-full px-4 py-3 text-left font-bold transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
-          :style="{
-            background: router.currentRoute.value.path === '/' ? 'rgba(46, 100, 254, 0.1)' : 'white',
-            color: router.currentRoute.value.path === '/' ? '#2E64FE' : '#212121'
-          }"
-        >
-          Dashboard
-        </button>
-        <button
-          @click="navigateTo('/tenders')"
-          class="w-full px-4 py-3 text-left font-bold transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
-          :style="{
-            background: router.currentRoute.value.path.startsWith('/tenders') ? 'rgba(46, 100, 254, 0.1)' : 'white',
-            color: router.currentRoute.value.path.startsWith('/tenders') ? '#2E64FE' : '#212121'
-          }"
-        >
-          Tenders
-        </button>
-        <button
-          v-if="authStore.isEvaluator"
-          @click="navigateTo('/questionnaires')"
-          class="w-full px-4 py-3 text-left font-bold transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
-          :style="{
-            background: router.currentRoute.value.path.startsWith('/questionnaires') ? 'rgba(46, 100, 254, 0.1)' : 'white',
-            color: router.currentRoute.value.path.startsWith('/questionnaires') ? '#2E64FE' : '#212121'
-          }"
-        >
-          Questionnaires
-        </button>
-        <button
-          @click="navigateTo('/responses')"
-          class="w-full px-4 py-3 text-left font-bold transition-all duration-300 hover:shadow-lg hover:scale-105 rounded-xl"
-          :style="{
-            background: router.currentRoute.value.path.startsWith('/responses') ? 'rgba(46, 100, 254, 0.1)' : 'white',
-            color: router.currentRoute.value.path.startsWith('/responses') ? '#2E64FE' : '#212121'
-          }"
-        >
-          Responses
-        </button>
-      </div>
-    </div>
-  </header>
+  </div>
 </template>
 
-<style>
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(46, 100, 254, 0.4);
-  }
+<style scoped>
+.navbar-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.12);
+  box-shadow: 0 2px 20px rgba(99, 102, 241, 0.08);
 }
 
-.pulse-glow {
-  animation: pulseGlow 3s ease-in-out infinite;
+.navbar-logo {
+  color: #0F172A;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.5px;
 }
 
-.header-gradient-alt {
-  background: linear-gradient(135deg, #2E64FE 0%, #00B4D8 100%);
+.navbar-logo-accent {
+  background: linear-gradient(135deg, #6366F1, #06B6D4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.nav-btn {
+  color: #64748B;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-btn:hover {
+  color: #6366F1;
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.nav-btn-active {
+  color: #6366F1 !important;
+  background: rgba(99, 102, 241, 0.12) !important;
+  font-weight: 700;
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #F8FAFF;
+  border: 1.5px solid #E2E8F0;
+  color: #64748B;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.icon-btn:hover {
+  border-color: #6366F1;
+  color: #6366F1;
+  background: #EEF2FF;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  background: #EF4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  animation: badge-pop 0.3s cubic-bezier(0.68,-0.55,0.27,1.55);
+}
+
+@keyframes badge-pop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+.user-btn {
+  background: #F8FAFF;
+  border: 1.5px solid #E2E8F0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-btn:hover {
+  border-color: #6366F1;
+  background: #EEF2FF;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366F1, #06B6D4);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.dropdown-panel {
+  position: absolute;
+  background: white;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.15), 0 4px 12px rgba(99,102,241,0.1);
+  z-index: 9999;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.notif-item {
+  transition: background 0.15s ease;
+}
+
+.notif-item:hover { background: #F8FAFF; }
+.notif-unread { background: #EEF2FF; }
+
+/* Dropdown transition */
+.dropdown-enter-active, .dropdown-leave-active {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dropdown-enter-from, .dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.97);
 }
 </style>

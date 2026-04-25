@@ -18,6 +18,17 @@ const credentials = ref({
 const loading = ref(false)
 const error = ref('')
 
+const features = [
+  { icon: 'pi pi-briefcase', title: 'Manage Tenders', desc: 'Create & publish tender opportunities', gradient: 'linear-gradient(135deg,#6366F1,#8B5CF6)' },
+  { icon: 'pi pi-users', title: 'Vendor Management', desc: 'Track submissions & compliance', gradient: 'linear-gradient(135deg,#06B6D4,#0EA5E9)' },
+  { icon: 'pi pi-chart-bar', title: 'Analytics & Reports', desc: 'Real-time dashboards & insights', gradient: 'linear-gradient(135deg,#10B981,#06B6D4)' },
+]
+const stats = [
+  { value: '500+', label: 'Tenders Managed' },
+  { value: '98%', label: 'Client Satisfaction' },
+  { value: '3x', label: 'Faster Procurement' },
+]
+
 const handleLogin = async () => {
   loading.value = true
   error.value = ''
@@ -34,218 +45,254 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col relative overflow-hidden" style="background: linear-gradient(135deg, #F8FCFF 0%, #E0F2F7 100%); font-family: 'Montserrat', sans-serif;">
-    <!-- Progress Indicator -->
-    <div class="h-1 w-full" style="background: #E0F2F7;">
-      <div class="progress-bar h-full" style="background: linear-gradient(90deg, #2E64FE, #00B4D8, #48CAE4);"></div>
+  <div class="login-root h-screen flex overflow-hidden" style="font-family: 'Montserrat', sans-serif;">
+
+    <!-- LEFT PANEL — Dark Gradient Hero -->
+    <div class="login-left hidden lg:flex flex-col justify-between p-10 relative overflow-hidden" style="width: 45%; background: linear-gradient(145deg, #0A0F1E 0%, #1a1040 50%, #0d1f3c 100%);">
+
+      <!-- Glow orbs -->
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+
+      <!-- Logo -->
+      <div class="relative z-10">
+        <span class="text-4xl font-black login-logo">Construct<span style="color:#06B6D4;">IQ</span></span>
+        <p class="text-sm mt-1" style="color: rgba(255,255,255,0.5); letter-spacing:3px; text-transform:uppercase;">Tender Suite</p>
+      </div>
+
+      <!-- Hero Text & Feature Cards -->
+      <div class="relative z-10 space-y-8">
+        <div>
+          <h2 class="text-4xl font-black leading-tight" style="color: #fff;">Manage Tenders<br/><span class="hero-gradient-text">Smarter & Faster</span></h2>
+          <p class="mt-3 text-sm leading-relaxed" style="color: rgba(255,255,255,0.55);">The all-in-one platform for construction procurement, vendor management, and contract oversight.</p>
+        </div>
+
+        <div class="space-y-3">
+          <div v-for="(feat, i) in features" :key="i" class="feature-card flex items-center space-x-4" :style="{ animationDelay: i * 150 + 'ms' }">
+            <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl" :style="{ background: feat.gradient }">
+              <i :class="feat.icon" class="text-white text-sm"></i>
+            </div>
+            <div>
+              <p class="text-sm font-bold" style="color:#fff;">{{ feat.title }}</p>
+              <p class="text-xs" style="color:rgba(255,255,255,0.5);">{{ feat.desc }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="grid grid-cols-3 gap-4">
+          <div v-for="stat in stats" :key="stat.label" class="text-center">
+            <p class="text-2xl font-black hero-gradient-text">{{ stat.value }}</p>
+            <p class="text-xs mt-1" style="color:rgba(255,255,255,0.45);">{{ stat.label }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <p class="relative z-10 text-xs" style="color: rgba(255,255,255,0.3);">© 2024 ConstructIQ. All rights reserved.</p>
     </div>
 
-    <!-- Floating Particles -->
-    <div class="particle particle-1"></div>
-    <div class="particle particle-2"></div>
-    <div class="particle particle-3"></div>
-    <div class="particle particle-4"></div>
-    <div class="particle particle-5"></div>
-    <div class="particle particle-6"></div>
+    <!-- RIGHT PANEL — Login Form -->
+    <div class="flex-1 flex flex-col items-center justify-center px-8 py-10 relative" style="background: #F8FAFF;">
 
-    <!-- Header Bar -->
-    <header class="flex items-center px-8 py-4 relative z-10" style="background: #E0F2F7;">
-      <span class="text-3xl font-extrabold header-gradient-alt" style="font-family: 'Poppins', sans-serif; letter-spacing: 2px; text-shadow: 0 0 20px rgba(168, 85, 247, 0.3);">Construct<span style="font-weight: 900;">IQ</span></span>
-    </header>
+      <!-- Top accent line -->
+      <div class="absolute top-0 left-0 right-0 h-1" style="background: linear-gradient(90deg, #6366F1, #8B5CF6, #06B6D4);"></div>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex items-center px-8 py-8 relative z-10 overflow-y-auto">
-      <div class="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start pt-4">
-        <!-- Left Panel - App Info with Geometric Shape -->
-        <div class="relative">
-          <!-- Abstract Geometric Shape with Morphing -->
-          <div class="absolute top-0 left-0 w-96 h-96 opacity-20 morph-shape" style="background: linear-gradient(135deg, #2E64FE 0%, #00B4D8 100%);"></div>
-          <div class="absolute top-20 left-20 w-64 h-64 opacity-15 morph-shape-2" style="background: linear-gradient(135deg, #00B4D8 0%, #2E64FE 100%);"></div>
-          
-          <div class="relative z-10 space-y-8">
-            <div class="space-y-4">
-              <div class="p-4 rounded-2xl pulse-glow transition-all duration-300 hover:shadow-xl hover:scale-105" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);">
-                <div class="flex items-start space-x-4">
-                  <div class="w-10 h-10 flex items-center justify-center rounded-xl icon-animate" style="background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);">
-                    <i class="pi pi-briefcase text-white text-lg"></i>
-                  </div>
-                  <div>
-                    <h3 class="font-bold text-sm" style="color: #212121;">Manage Tenders</h3>
-                    <p class="text-xs mt-1" style="color: #666;">Create, publish, and manage tender opportunities efficiently</p>
-                  </div>
-                </div>
-              </div>
+      <div class="w-full max-w-md">
 
-              <div class="p-4 rounded-2xl pulse-glow transition-all duration-300 hover:shadow-xl hover:scale-105" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);">
-                <div class="flex items-start space-x-4">
-                  <div class="w-10 h-10 flex items-center justify-center rounded-xl icon-animate" style="background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%); animation-delay: 1s;">
-                    <i class="pi pi-user-plus text-white text-lg"></i>
-                  </div>
-                  <div>
-                    <h3 class="font-bold text-sm" style="color: #212121;">Vendor Management</h3>
-                    <p class="text-xs mt-1" style="color: #666;">Track and evaluate vendor submissions and compliance</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="p-4 rounded-2xl pulse-glow transition-all duration-300 hover:shadow-xl hover:scale-105" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);">
-                <div class="flex items-start space-x-4">
-                  <div class="w-10 h-10 flex items-center justify-center rounded-xl icon-animate" style="background: linear-gradient(135deg, #10B981 0%, #06B6D4 100%); animation-delay: 2s;">
-                    <i class="pi pi-chart-bar text-white text-lg"></i>
-                  </div>
-                  <div>
-                    <h3 class="font-bold text-sm" style="color: #212121;">Analytics & Reports</h3>
-                    <p class="text-xs mt-1" style="color: #666;">Gain insights with comprehensive dashboards and reports</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Positive One-Point Features -->
-            <div class="grid grid-cols-2 gap-3">
-              <div class="flex items-center space-x-2 p-3 rounded-xl transition-all duration-300 hover:scale-105" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);">
-                <div class="w-8 h-8 flex items-center justify-center rounded-lg" style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);">
-                  <i class="pi pi-shield text-white text-sm"></i>
-                </div>
-                <span class="text-xs font-semibold" style="color: #212121;">Secure & Compliant</span>
-              </div>
-
-              <div class="flex items-center space-x-2 p-3 rounded-xl transition-all duration-300 hover:scale-105" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);">
-                <div class="w-8 h-8 flex items-center justify-center rounded-lg" style="background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%);">
-                  <i class="pi pi-bell text-white text-sm"></i>
-                </div>
-                <span class="text-xs font-semibold" style="color: #212121;">Real-time Alerts</span>
-              </div>
-
-              <div class="flex items-center space-x-2 p-3 rounded-xl transition-all duration-300 hover:scale-105" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);">
-                <div class="w-8 h-8 flex items-center justify-center rounded-lg" style="background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);">
-                  <i class="pi pi-clock text-white text-sm"></i>
-                </div>
-                <span class="text-xs font-semibold" style="color: #212121;">24/7 Support</span>
-              </div>
-
-              <div class="flex items-center space-x-2 p-3 rounded-xl transition-all duration-300 hover:scale-105" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);">
-                <div class="w-8 h-8 flex items-center justify-center rounded-lg" style="background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%);">
-                  <i class="pi pi-mobile text-white text-sm"></i>
-                </div>
-                <span class="text-xs font-semibold" style="color: #212121;">Mobile Friendly</span>
-              </div>
-            </div>
-          </div>
+        <!-- Mobile logo -->
+        <div class="lg:hidden mb-8 text-center">
+          <span class="text-3xl font-black" style="color:#1E1B4B;">Construct<span style="color:#06B6D4;">IQ</span></span>
         </div>
 
-        <!-- Right Panel - Login Form -->
-        <div class="space-y-6">
-          <div class="p-6 rounded-2xl pulse-glow" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 2px solid rgba(46, 100, 254, 0.3); box-shadow: 0 0 30px rgba(46, 100, 254, 0.2);">
-            <h1 class="text-2xl font-extrabold gradient-text text-left mb-6">Sign In</h1>
-            <form @submit.prevent="handleLogin" class="space-y-4">
-              <div>
-                <label for="email" class="block text-xs font-semibold mb-1" style="color: #212121;">
-                  Email
-                </label>
-                <InputText
-                  id="email"
-                  v-model="credentials.email"
-                  type="email"
-                  placeholder="Enter your email"
-                  class="w-full input-glow"
-                  autocomplete="email"
-                  required
-                  style="background: white; border: 2px solid #E0F2F7; border-radius: 10px; padding: 12px; font-family: 'Open Sans', sans-serif; transition: all 0.3s; font-size: 14px;"
-                />
-              </div>
-
-              <div>
-                <label for="password" class="block text-xs font-semibold mb-1" style="color: #212121;">
-                  Password
-                </label>
-                <Password
-                  id="password"
-                  v-model="credentials.password"
-                  placeholder="Enter your password"
-                  class="w-full input-glow"
-                  :feedback="false"
-                  toggleMask
-                  autocomplete="current-password"
-                  required
-                  :inputStyle="{ background: 'white', border: '2px solid #E0F2F7', borderRadius: '10px', padding: '12px', width: '100%', fontFamily: 'Open Sans, sans-serif', transition: 'all 0.3s', fontSize: '14px' }"
-                  :panelStyle="{ background: 'white', border: '2px solid #E0F2F7', borderRadius: '10px' }"
-                />
-              </div>
-
-              <div v-if="error" class="p-3 text-xs font-semibold" style="background: #FEE2E2; border-radius: 10px; color: #DC2626;">
-                {{ error }}
-              </div>
-
-              <button
-                type="submit"
-                :disabled="loading"
-                class="w-full py-3 text-sm font-bold rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105"
-                style="background: linear-gradient(135deg, #2E64FE 0%, #00B4D8 100%); border: none; color: white;"
-              >
-                {{ loading ? 'Signing in...' : 'Sign In' }}
-              </button>
-            </form>
-
-            <div class="text-center mt-4">
-              <p class="text-xs" style="color: #666;">
-                Demo credentials: admin@acme.com / Admin@123
-              </p>
-            </div>
-
-            <!-- Forgot Password & Sign Up Links -->
-            <div class="flex justify-between items-center text-xs mt-4">
-              <a href="#" class="hover:underline" style="color: #2E64FE;">Forgot password?</a>
-              <a href="#" class="hover:underline" style="color: #2E64FE;">Don't have an account? Sign up</a>
-            </div>
-
-            <!-- Social Login -->
-            <div class="space-y-3 mt-4">
-              <div class="relative">
-                <div class="absolute inset-0 flex items-center">
-                  <div class="w-full border-t" style="border-color: #E0F2F7;"></div>
-                </div>
-                <div class="relative flex justify-center text-xs">
-                  <span class="px-3" style="background: rgba(255, 255, 255, 0.9); color: #666;">Or continue with</span>
-                </div>
-              </div>
-              <div class="flex justify-center space-x-3">
-                <button class="w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 hover:shadow-lg hover:scale-110" style="background: white; border: 2px solid #E0F2F7;">
-                  <i class="pi pi-google" style="color: #DB4437;"></i>
-                </button>
-                <button class="w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 hover:shadow-lg hover:scale-110" style="background: white; border: 2px solid #E0F2F7;">
-                  <i class="pi pi-microsoft" style="color: #00A4EF;"></i>
-                </button>
-                <button class="w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 hover:shadow-lg hover:scale-110" style="background: white; border: 2px solid #E0F2F7;">
-                  <i class="pi pi-linkedin" style="color: #0077B5;"></i>
-                </button>
-              </div>
-            </div>
+        <!-- Form Card -->
+        <div class="form-card p-8 rounded-3xl">
+          <div class="mb-7">
+            <h1 class="text-2xl font-black" style="color:#0F172A;">Welcome back 👋</h1>
+            <p class="text-sm mt-1" style="color:#64748B;">Sign in to your ConstructIQ account</p>
           </div>
+
+          <form @submit.prevent="handleLogin" class="space-y-5">
+            <div>
+              <label class="block text-xs font-bold mb-1.5 uppercase tracking-wide" style="color:#475569;">Email Address</label>
+              <input
+                v-model="credentials.email"
+                type="email"
+                placeholder="admin@acme.com"
+                autocomplete="email"
+                required
+                class="premium-input w-full"
+              />
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1.5">
+                <label class="block text-xs font-bold uppercase tracking-wide" style="color:#475569;">Password</label>
+                <a href="#" class="text-xs font-semibold" style="color:#6366F1;">Forgot password?</a>
+              </div>
+              <Password
+                v-model="credentials.password"
+                placeholder="Enter your password"
+                :feedback="false"
+                toggleMask
+                autocomplete="current-password"
+                required
+                class="w-full"
+                :inputStyle="{ width:'100%', background:'#F8FAFF', border:'1.5px solid #E2E8F0', borderRadius:'12px', padding:'12px 16px', fontSize:'14px', fontFamily:'Montserrat, sans-serif', color:'#0F172A' }"
+                :panelStyle="{ background:'white', borderRadius:'12px', border:'1.5px solid #E2E8F0' }"
+              />
+            </div>
+
+            <div v-if="error" class="flex items-center space-x-2 p-3 rounded-xl text-xs font-semibold" style="background:#FEF2F2; color:#DC2626; border:1px solid #FECACA;">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ error }}</span>
+            </div>
+
+            <button
+              type="submit"
+              :disabled="loading"
+              class="premium-btn w-full py-3.5 rounded-xl font-bold text-sm text-white"
+            >
+              <span v-if="loading" class="flex items-center justify-center gap-2">
+                <i class="pi pi-spinner pi-spin"></i> Signing in...
+              </span>
+              <span v-else>Sign In →</span>
+            </button>
+          </form>
+
+          <!-- Divider -->
+          <div class="flex items-center my-5">
+            <div class="flex-1 h-px" style="background:#E2E8F0;"></div>
+            <span class="px-3 text-xs font-semibold" style="color:#94A3B8;">Or continue with</span>
+            <div class="flex-1 h-px" style="background:#E2E8F0;"></div>
+          </div>
+
+          <!-- Social buttons -->
+          <div class="flex gap-3">
+            <button class="social-btn flex-1 py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-bold">
+              <i class="pi pi-google" style="color:#DB4437;"></i> Google
+            </button>
+            <button class="social-btn flex-1 py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-bold">
+              <i class="pi pi-microsoft" style="color:#00A4EF;"></i> Microsoft
+            </button>
+          </div>
+
+          <p class="text-center text-xs mt-5" style="color:#94A3B8;">
+            Demo: <span style="color:#6366F1; font-weight:700;">admin@acme.com</span> / <span style="color:#6366F1; font-weight:700;">Admin@123</span>
+          </p>
         </div>
       </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="px-8 py-6 relative z-10" style="background: #E0F2F7;">
-      <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-        <p class="text-sm" style="color: #666;">© 2024 ConstructIQ Tender Suite. All rights reserved.</p>
-        <div class="flex space-x-6 text-sm">
-          <a href="#" class="hover:underline" style="color: #2E64FE;">Privacy Policy</a>
-          <a href="#" class="hover:underline" style="color: #2E64FE;">Terms of Service</a>
-        </div>
-        <div class="flex space-x-4">
-          <a href="#" class="hover:scale-110 transition-transform" style="color: #2E64FE;">
-            <i class="pi pi-facebook text-xl"></i>
-          </a>
-          <a href="#" class="hover:scale-110 transition-transform" style="color: #2E64FE;">
-            <i class="pi pi-twitter text-xl"></i>
-          </a>
-          <a href="#" class="hover:scale-110 transition-transform" style="color: #2E64FE;">
-            <i class="pi pi-linkedin text-xl"></i>
-          </a>
-        </div>
-      </div>
-    </footer>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.login-root { font-family: 'Montserrat', sans-serif; }
+
+/* LEFT PANEL ORBS */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+}
+.orb-1 { width: 350px; height: 350px; background: #6366F1; top: -80px; right: -80px; }
+.orb-2 { width: 250px; height: 250px; background: #06B6D4; bottom: 60px; left: -60px; }
+.orb-3 { width: 180px; height: 180px; background: #8B5CF6; top: 50%; left: 40%; }
+
+.login-logo { color: #fff; letter-spacing: 1px; }
+
+.hero-gradient-text {
+  background: linear-gradient(90deg, #6366F1, #06B6D4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.feature-card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 14px 16px;
+  animation: feature-slide 0.6s ease-out both;
+}
+
+@keyframes feature-slide {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* RIGHT PANEL */
+.form-card {
+  background: #fff;
+  border: 1.5px solid #E2E8F0;
+  box-shadow: 0 20px 60px rgba(99,102,241,0.10), 0 4px 16px rgba(0,0,0,0.06);
+  animation: card-rise 0.5s ease-out both;
+}
+
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.premium-input {
+  background: #F8FAFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  color: #0F172A;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.premium-input:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+  background: #fff;
+}
+
+.premium-btn {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #06B6D4 100%);
+  background-size: 200% 200%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: gradient-shift 4s ease infinite;
+  box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+}
+
+.premium-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(99,102,241,0.5);
+}
+
+.premium-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.social-btn {
+  background: #F8FAFF;
+  border: 1.5px solid #E2E8F0;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.social-btn:hover {
+  border-color: #6366F1;
+  background: #EEF2FF;
+  transform: translateY(-1px);
+}
+</style>

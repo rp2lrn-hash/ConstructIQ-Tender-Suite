@@ -3,159 +3,283 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-const props = defineProps({
-  open: Boolean
-})
-
+const props = defineProps({ collapsed: Boolean })
 const emit = defineEmits(['toggle'])
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-const menuItems = computed(() => {
-  const items = [
-    { icon: 'pi pi-home', label: 'Dashboard', path: '/' },
+const isActive = (path) => path === '/' ? route.path === '/' : route.path.startsWith(path)
+
+const navGroups = computed(() => {
+  const groups = [
+    {
+      label: 'Overview',
+      items: [
+        { icon: 'pi pi-th-large', label: 'Dashboard', path: '/' },
+      ]
+    },
+    {
+      label: 'Procurement',
+      items: [
+        { icon: 'pi pi-file', label: 'Tenders', path: '/tenders' },
+        { icon: 'pi pi-users', label: 'Vendors', path: '/vendors' },
+        { icon: 'pi pi-send', label: 'Bids', path: '/bids' },
+      ]
+    },
+    {
+      label: 'Workflow',
+      items: [
+        { icon: 'pi pi-reply', label: 'Responses', path: '/responses' },
+        ...(authStore.isEvaluator ? [
+          { icon: 'pi pi-list-check', label: 'Questionnaires', path: '/questionnaires' },
+          { icon: 'pi pi-chart-bar', label: 'Evaluations', path: '/evaluations' },
+          { icon: 'pi pi-briefcase', label: 'Contracts', path: '/contracts' },
+        ] : [])
+      ]
+    },
   ]
-
   if (authStore.isAdmin) {
-    items.push(
-      { icon: 'pi pi-users', label: 'Users', path: '/admin/users' },
-      { icon: 'pi pi-building', label: 'Customers', path: '/admin/customers' },
-      { icon: 'pi pi-history', label: 'Audit Logs', path: '/admin/audit-logs' }
-    )
+    groups.push({
+      label: 'Admin',
+      items: [
+        { icon: 'pi pi-user-edit', label: 'Users', path: '/admin/users' },
+        { icon: 'pi pi-building', label: 'Customers', path: '/admin/customers' },
+        { icon: 'pi pi-history', label: 'Audit Logs', path: '/admin/audit-logs' },
+      ]
+    })
   }
-
-  items.push(
-    { icon: 'pi pi-file', label: 'Tenders', path: '/tenders' },
-    { icon: 'pi pi-truck', label: 'Vendors', path: '/vendors' },
-    { icon: 'pi pi-send', label: 'Bids', path: '/bids' }
-  )
-
-  if (authStore.isEvaluator) {
-    items.push(
-      { icon: 'pi pi-chart-bar', label: 'Evaluations', path: '/evaluations' },
-      { icon: 'pi pi-file-edit', label: 'Contracts', path: '/contracts' }
-    )
-  }
-
-  return items
+  return groups
 })
-
-const navigate = (path) => {
-  router.push(path)
-}
 </script>
 
 <template>
-  <aside 
-    :class="[
-      'text-text-primary transition-all duration-300 flex flex-col relative z-10',
-      open ? 'w-[260px]' : 'w-20'
-    ]"
-    style="height: 100vh; background: rgba(2, 62, 138, 0.7); backdrop-filter: blur(10px); border-right: 2px solid rgba(72, 202, 228, 0.3); box-shadow: 0 0 20px rgba(72, 202, 228, 0.2);"
-  >
-    <div class="p-6" style="border-bottom: 2px solid rgba(72, 202, 228, 0.3);">
-      <h1 v-if="open" class="text-2xl font-extrabold leading-tight" style="font-family: 'Poppins', sans-serif; letter-spacing: 2px; text-shadow: 0 0 20px rgba(72, 202, 228, 0.5); background: linear-gradient(135deg, #48CAE4, #0096C7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-        Construct<span style="font-weight: 900;">IQ</span>
-      </h1>
-      <div v-else class="text-center">
-        <i class="pi pi-box text-2xl" style="color: #48CAE4;"></i>
+  <aside class="sidebar flex flex-col" :class="collapsed ? 'sidebar-collapsed' : 'sidebar-expanded'">
+
+    <!-- Logo -->
+    <div class="sidebar-logo" @click="emit('toggle')">
+      <transition name="label-fade">
+        <span v-if="!collapsed" class="logo-text">Construct<span class="logo-accent">IQ</span></span>
+      </transition>
+      <button v-if="!collapsed" class="ml-auto collapse-btn" @click.stop="emit('toggle')">
+        <i class="pi pi-chevron-left text-xs"></i>
+      </button>
+      <div v-if="collapsed" class="logo-icon">
+        <span class="logo-accent" style="font-weight:900; font-size:14px;">IQ</span>
       </div>
     </div>
 
-    <nav class="flex-1 p-4 space-y-6 overflow-y-auto">
-      <div v-if="open">
-        <p class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: rgba(255, 255, 255, 0.7);">Main</p>
-        <div class="space-y-2">
+    <!-- Nav -->
+    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+      <div v-for="group in navGroups" :key="group.label">
+        <transition name="label-fade">
+          <p v-if="!collapsed" class="nav-group-label">{{ group.label }}</p>
+        </transition>
+        <div class="space-y-1">
           <button
-            v-for="item in menuItems.filter(i => ['/', '/tenders'].includes(i.path))"
+            v-for="item in group.items"
             :key="item.path"
-            @click="navigate(item.path)"
-            class="flex items-center w-full p-3 transition-all duration-200 text-white font-medium hover:opacity-90"
-            :style="route.path === item.path
-              ? 'background: linear-gradient(135deg, #48CAE4, #0096C7); border-radius: 9px; box-shadow: 0 0 20px rgba(72, 202, 228, 0.4);'
-              : 'background: linear-gradient(135deg, rgba(72, 202, 228, 0.3), rgba(0, 150, 199, 0.3)); border-radius: 9px; box-shadow: 0 0 15px rgba(72, 202, 228, 0.2);'
-            "
+            @click="router.push(item.path)"
+            class="nav-item"
+            :class="isActive(item.path) ? 'nav-item-active' : ''"
+            :title="collapsed ? item.label : ''"
           >
-            <i :class="[item.icon, 'text-lg']"></i>
-            <span class="ml-3">{{ item.label }}</span>
-            <span v-if="item.path === '/tenders'" class="ml-auto text-white text-xs px-2 py-0.5" style="background: rgba(255, 255, 255, 0.3); border-radius: 999px;">32</span>
+            <i :class="item.icon" class="nav-icon"></i>
+            <transition name="label-fade">
+              <span v-if="!collapsed" class="nav-label">{{ item.label }}</span>
+            </transition>
           </button>
         </div>
-      </div>
-
-      <div v-if="open && authStore.isEvaluator">
-        <p class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: rgba(255, 255, 255, 0.7);">Finance</p>
-        <div class="space-y-2">
-          <button
-            v-for="item in menuItems.filter(i => ['/evaluations', '/contracts'].includes(i.path))"
-            :key="item.path"
-            @click="navigate(item.path)"
-            class="flex items-center w-full p-3 transition-all duration-200 text-white font-medium hover:opacity-90"
-            :style="route.path === item.path
-              ? 'background: linear-gradient(135deg, #48CAE4, #0096C7); border-radius: 9px; box-shadow: 0 0 20px rgba(72, 202, 228, 0.4);'
-              : 'background: linear-gradient(135deg, rgba(72, 202, 228, 0.3), rgba(0, 150, 199, 0.3)); border-radius: 9px; box-shadow: 0 0 15px rgba(72, 202, 228, 0.2);'
-            "
-          >
-            <i :class="[item.icon, 'text-lg']"></i>
-            <span class="ml-3">{{ item.label }}</span>
-          </button>
-        </div>
-      </div>
-
-      <div v-if="open && authStore.isAdmin">
-        <p class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: rgba(255, 255, 255, 0.7);">Admin</p>
-        <div class="space-y-2">
-          <button
-            v-for="item in menuItems.filter(i => ['/admin/users', '/admin/customers', '/admin/audit-logs'].includes(i.path))"
-            :key="item.path"
-            @click="navigate(item.path)"
-            class="flex items-center w-full p-3 transition-all duration-200 text-white font-medium hover:opacity-90"
-            :style="route.path === item.path
-              ? 'background: linear-gradient(135deg, #48CAE4, #0096C7); border-radius: 9px; box-shadow: 0 0 20px rgba(72, 202, 228, 0.4);'
-              : 'background: linear-gradient(135deg, rgba(72, 202, 228, 0.3), rgba(0, 150, 199, 0.3)); border-radius: 9px; box-shadow: 0 0 15px rgba(72, 202, 228, 0.2);'
-            "
-          >
-            <i :class="[item.icon, 'text-lg']"></i>
-            <span class="ml-3">{{ item.label }}</span>
-          </button>
-        </div>
-      </div>
-
-      <div v-if="!open" class="space-y-2">
-        <button
-          v-for="item in menuItems"
-          :key="item.path"
-          @click="navigate(item.path)"
-          class="flex items-center justify-center w-full p-3 transition-all duration-200 text-white hover:opacity-90"
-          :style="route.path === item.path
-            ? 'background: linear-gradient(135deg, #48CAE4, #0096C7); border-radius: 9px; box-shadow: 0 0 20px rgba(72, 202, 228, 0.4);'
-            : 'background: linear-gradient(135deg, rgba(72, 202, 228, 0.3), rgba(0, 150, 199, 0.3)); border-radius: 9px; box-shadow: 0 0 15px rgba(72, 202, 228, 0.2);'
-          "
-        >
-          <i :class="[item.icon, 'text-lg']"></i>
-        </button>
       </div>
     </nav>
 
-    <div class="p-4" style="border-top: 2px solid rgba(72, 202, 228, 0.3);">
-      <button
-        @click="navigate('/profile')"
-        class="flex items-center w-full p-3 transition-all duration-200 text-white font-medium hover:opacity-90"
-        :style="route.path === '/profile'
-          ? 'background: linear-gradient(135deg, #48CAE4, #0096C7); border-radius: 9px; box-shadow: 0 0 20px rgba(72, 202, 228, 0.4);'
-          : 'background: linear-gradient(135deg, rgba(72, 202, 228, 0.3), rgba(0, 150, 199, 0.3)); border-radius: 9px; box-shadow: 0 0 15px rgba(72, 202, 228, 0.2);'
-        "
-      >
-        <div class="w-8 h-8 flex items-center justify-center text-white font-semibold text-sm" style="background: rgba(255, 255, 255, 0.3); border-radius: 999px;">
-          {{ authStore.user?.name?.charAt(0) || 'U' }}
-        </div>
-        <div v-if="open" class="ml-3 text-left">
-          <p class="text-sm font-medium">{{ authStore.user?.name }}</p>
-          <p class="text-xs capitalize">{{ authStore.user?.role?.replace('_', ' ') }}</p>
-        </div>
-      </button>
-    </div>
   </aside>
 </template>
+
+<style scoped>
+.sidebar {
+  height: 100vh;
+  background: linear-gradient(160deg, #1E1B4B 0%, #312E81 40%, #1E3A5F 100%);
+  border-right: none;
+  transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 4px 0 24px rgba(15,23,42,0.18);
+}
+
+.sidebar-expanded  { width: 240px; }
+.sidebar-collapsed { width: 68px; }
+
+/* Logo */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  padding: 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  min-height: 64px;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366F1, #06B6D4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.logo-accent {
+  background: linear-gradient(135deg, #6366F1, #06B6D4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.45);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+.collapse-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.6);
+  transition: all 0.2s;
+}
+.collapse-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+/* Nav group */
+.nav-group-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  padding: 0 10px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+
+/* Nav item */
+.nav-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.nav-icon {
+  font-size: 15px;
+  color: rgba(255,255,255,0.5);
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+  transition: color 0.18s;
+}
+
+.nav-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  margin-left: 12px;
+  white-space: nowrap;
+  transition: color 0.18s;
+}
+
+.nav-item:hover .nav-icon,
+.nav-item:hover .nav-label { color: #fff; }
+
+.nav-item-active {
+  background: linear-gradient(135deg, rgba(255,255,255,0.18), rgba(99,102,241,0.25)) !important;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.25);
+}
+.nav-item-active .nav-icon,
+.nav-item-active .nav-label {
+  color: #fff !important;
+  font-weight: 700;
+}
+
+/* User footer */
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.user-card-collapsed { justify-content: center; }
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6366F1, #06B6D4);
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* Transition */
+.label-fade-enter-active, .label-fade-leave-active { transition: opacity 0.2s, transform 0.2s; }
+.label-fade-enter-from, .label-fade-leave-to { opacity: 0; transform: translateX(-6px); }
+</style>
